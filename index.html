@@ -1,0 +1,1145 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Next Bus • Estação Central (Básico)</title>
+
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+  <!-- Fonte -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg0:#081423;
+      --bg1:#0a2232;
+
+      --panel:#ffffff;
+
+      --text:#0f172a;
+      --dim:#475569;
+
+      --stroke:#d8e1ee;
+      --stroke2:#e6edf7;
+
+      --shadow: 0 18px 60px rgba(2,10,23,.18);
+
+      --vjd:#0f3f82; /* azul escuro */
+      --vsr:#5fc2ff; /* azul claro */
+
+      --ok:#1fa765;
+      --okSoft: rgba(31, 167, 101, .12);
+
+      --r: 18px;
+      --pad: clamp(14px, 2.0vw, 22px);
+
+      /* Paginação */
+      --bar: #1c5aa6;
+      --bar2: #34c6d0;
+
+      /* Cabeçalho sutil */
+      --header: linear-gradient(180deg, #2f6f9d 0%, #184c75 55%, #0f3b5e 100%);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      overflow:hidden;
+
+      background:
+        radial-gradient(1200px 900px at 25% 10%, rgba(87,184,231,.22) 0%, rgba(10,46,62,0) 60%),
+        radial-gradient(900px 700px at 75% 80%, rgba(52,198,208,.14) 0%, rgba(6,18,24,0) 65%),
+        radial-gradient(1400px 1100px at 50% 55%, var(--bg1) 0%, var(--bg0) 62%, #040a0f 100%);
+
+      padding: clamp(12px, 2vw, 22px);
+      display:grid;
+      place-items:center;
+    }
+
+    .panel{
+      width: min(1500px, 96vw);
+      height: calc(100vh - clamp(24px, 4vw, 44px));
+      border-radius: var(--r);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+
+      opacity:0;
+      transform: translateY(12px);
+      animation: inPanel 900ms cubic-bezier(.22,1,.36,1) forwards;
+      position:relative;
+    }
+    @keyframes inPanel{ to{ opacity:1; transform: translateY(0);} }
+
+    /* Cabeçalho sutil (estilo clima) */
+    .header{
+      padding: 14px var(--pad);
+      background: var(--header);
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 14px;
+      box-shadow: inset 0 -1px 0 rgba(255,255,255,.18);
+    }
+    .h-left{
+      display:flex;
+      align-items:center;
+      gap: 14px;
+      min-width: 0;
+    }
+    .busIcon{
+      width: 44px; height: 44px;
+      border-radius: 14px;
+      display:grid; place-items:center;
+      background: rgba(255,255,255,.10);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.16);
+      flex: 0 0 auto;
+    }
+    .busIcon .material-icons-outlined{ font-size: 24px; opacity: .95; }
+
+    .titleBlock{ min-width:0; }
+    .title{
+      font-size: clamp(18px, 2.2vw, 30px);
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .sub{
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      opacity: .92;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 70vw;
+    }
+    .h-right{
+      text-align:right;
+      white-space:nowrap;
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+      align-items:flex-end;
+    }
+    .clock{
+      font-size: clamp(34px, 4.1vw, 56px);
+      font-weight: 900;
+      letter-spacing: .06em;
+      line-height: 1;
+    }
+    .lastUpdate{
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      opacity: .92;
+    }
+
+    /* Faixa topo do conteúdo */
+    .panelTop{
+      padding: 12px var(--pad);
+      background: #f3f7ff;
+      border-bottom: 1px solid var(--stroke2);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap:wrap;
+    }
+    .panelInfo{
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #1f2a44;
+    }
+
+    .pager{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .bar{
+      width: 240px;
+      height: 10px;
+      border-radius: 999px;
+      background: #e7eefb;
+      border: 1px solid #d6e2f4;
+      overflow:hidden;
+    }
+    .bar > div{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--bar), var(--bar2));
+      border-radius: 999px;
+      transition: width 120ms linear;
+    }
+
+    .warn{
+      display:none;
+      margin: 12px var(--pad) 0;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #fff7ed;
+      border: 1px dashed #fdba74;
+      color: #7c2d12;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+    }
+
+    /* Conteúdo */
+    .stage{
+      position:relative;
+      flex: 1;
+      min-height:0;
+      padding: var(--pad);
+      overflow:hidden;
+      background: var(--panel);
+    }
+
+    .page{
+      position:absolute;
+      inset: var(--pad);
+      display:grid;
+      gap: 12px;
+      align-content:start;
+      opacity:0;
+      transform: translateX(18px);
+      pointer-events:none;
+    }
+    .page.active{
+      opacity:1;
+      transform: translateX(0);
+      pointer-events:auto;
+      transition: opacity 520ms ease, transform 520ms ease;
+    }
+    .page.exit{
+      opacity:0;
+      transform: translateX(-18px);
+      transition: opacity 520ms ease, transform 520ms ease;
+    }
+
+    .card{
+      position:relative;
+      border-radius: 16px;
+      background: #ffffff;
+      border: 1px solid var(--stroke);
+      box-shadow: 0 10px 26px rgba(2,10,23,.08);
+      overflow:hidden;
+      min-height: 92px;
+
+      display:grid;
+      grid-template-columns: 120px 1fr 260px;
+      gap: 14px;
+      align-items:center;
+      padding: 14px 16px;
+    }
+
+    .stripe{
+      position:absolute;
+      inset:0 auto 0 0;
+      width: 8px;
+      background: var(--vjd);
+    }
+
+    .lineCol{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      align-items:flex-start;
+      padding-left: 10px;
+    }
+    .lineNum{
+      font-size: 38px;
+      font-weight: 900;
+      letter-spacing: .02em;
+      line-height: 1;
+      color: #0b1220;
+    }
+    .company{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #0b1220;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke2);
+      background: #f7faff;
+    }
+    .dot{
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--vjd);
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.6);
+    }
+
+    .destCol{
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+    }
+    .destName{
+      font-size: clamp(24px, 2.4vw, 32px);
+      font-weight: 900;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+      color: #0b1220;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .timesCol{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap: 10px;
+    }
+
+    .next{
+      width: 100%;
+      max-width: 240px;
+      text-align:center;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: var(--okSoft);
+      border: 2px solid rgba(31, 167, 101, .25);
+    }
+    .next .when{
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      color: var(--ok);
+      line-height: 1.05;
+    }
+    /* ✅ neutro: não induz "tá chegando" */
+    .next .label{
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: rgba(31, 167, 101, .88);
+    }
+
+    .miniLabel{
+      width:100%;
+      max-width:240px;
+      text-align:right;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: #334155;
+      opacity: .78;
+      margin-top: -2px;
+    }
+
+    .pills{
+      width: 100%;
+      max-width: 240px;
+      display:flex;
+      justify-content:flex-end;
+      align-items:center;
+      flex-wrap: nowrap;
+      overflow: hidden;
+      gap: 8px;
+    }
+
+    /* ✅ pílula "cluster" (pode virar 08:21–08:22, ou 08:24 • 08:28 • …) */
+    .pill{
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke2);
+      background: #f1f5f9;
+      min-width: 86px;
+      text-align:center;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .10em;
+      color: #0b1220;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+
+    .empty{
+      padding: 22px 18px;
+      border-radius: 14px;
+      background: #f8fafc;
+      border: 1px solid var(--stroke2);
+      color: var(--dim);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      text-align:center;
+    }
+
+    /* ✅ Footer interno padrão painel (igual clima) */
+    .panelFooter{
+      padding: 10px var(--pad);
+      border-top: 1px solid var(--stroke2);
+      background: #f8fbff;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap:wrap;
+    }
+    .footLeft, .footRight{
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: #334155;
+      opacity: .86;
+      white-space:nowrap;
+    }
+
+    /* Logo discreta no canto da TELA */
+    .brand{
+      position: fixed;
+      bottom: 14px;
+      right: 16px;
+      opacity: .22;
+      pointer-events:none;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.14));
+      z-index: 999;
+    }
+    .brand img{ height: 22px; width:auto; display:block; }
+
+    /* Responsivo mantendo o mesmo layout (3 colunas) */
+    @media (max-width: 980px){
+      body{ padding: 10px; }
+      .panel{ width: 98vw; height: calc(100vh - 20px); }
+
+      .header{ padding: 14px var(--pad); gap: 12px; }
+      .busIcon{ width: 40px; height: 40px; border-radius: 12px; }
+      .busIcon .material-icons-outlined{ font-size: 22px; }
+
+      .title{ font-size: 22px; }
+      .sub{ font-size: 11px; max-width: 58vw; }
+
+      .clock{ font-size: 42px; }
+      .lastUpdate{ font-size: 11px; }
+
+      .panelTop{ padding: 10px var(--pad); }
+      .panelInfo{ font-size: 11px; }
+      .pager{ font-size: 11px; gap: 10px; }
+      .bar{ width: 170px; height: 9px; }
+
+      .stage{ padding: 12px; }
+      .page{ inset: 12px; gap: 10px; }
+
+      .card{
+        min-height: 76px;
+        padding: 12px 14px;
+        gap: 12px;
+        grid-template-columns: 96px 1fr 210px;
+        border-radius: 14px;
+      }
+      .stripe{ width: 7px; }
+      .lineCol{ gap: 8px; padding-left: 8px; }
+      .lineNum{ font-size: 30px; }
+      .company{ font-size: 11px; padding: 5px 9px; }
+      .dot{ width: 9px; height: 9px; }
+      .destName{ font-size: 22px; }
+
+      .next{ max-width: 200px; padding: 9px 10px; border-radius: 12px; }
+      .next .when{ font-size: 28px; }
+      .next .label{ font-size: 10px; margin-top: 5px; }
+      .miniLabel{ max-width: 200px; font-size: 10px; }
+
+      .pills{ max-width: 200px; gap: 7px; }
+      .pill{ padding: 7px 9px; min-width: 78px; font-size: 11px; }
+
+      .panelFooter{ padding: 9px var(--pad); }
+      .footLeft,.footRight{ font-size: 10px; }
+
+      .brand{ bottom: 10px; right: 12px; opacity: .18; }
+      .brand img{ height: 18px; }
+    }
+
+    @media (max-width: 640px){
+      .title{ font-size: 18px; }
+      .sub{ font-size: 10px; max-width: 54vw; }
+      .clock{ font-size: 34px; }
+
+      .bar{ width: 130px; height: 8px; }
+
+      .card{
+        grid-template-columns: 86px 1fr 180px;
+        padding: 11px 12px;
+        min-height: 70px;
+      }
+      .lineNum{ font-size: 26px; }
+      .company{ font-size: 10px; }
+      .destName{ font-size: 18px; }
+
+      .next{ max-width: 170px; }
+      .next .when{ font-size: 24px; }
+      .miniLabel{ max-width: 170px; }
+
+      .pills{ max-width: 170px; }
+      .pill{ min-width: 70px; font-size: 10px; }
+
+      .panelFooter{ padding: 8px 12px; }
+      .footLeft,.footRight{ font-size: 10px; }
+    }
+  </style>
+</head>
+
+<body>
+  <section class="panel" aria-label="Painel de horários">
+    <div class="header">
+      <div class="h-left">
+        <div class="busIcon" aria-hidden="true">
+          <span class="material-icons-outlined">directions_bus</span>
+        </div>
+        <div class="titleBlock">
+          <div class="title">Estação Central</div>
+          <div class="sub" id="subStatus">Carregando…</div>
+        </div>
+      </div>
+
+      <div class="h-right">
+        <div class="clock" id="clock">--:--</div>
+        <div class="lastUpdate" id="lastUpdate">Última atualização • —</div>
+      </div>
+    </div>
+
+    <div class="panelTop">
+      <div class="panelInfo">Próximas saídas (2h) • Next Bus</div>
+      <div class="pager">
+        <span id="pageLabel">PÁGINA 1/1</span>
+        <div class="bar" aria-hidden="true"><div id="barFill"></div></div>
+      </div>
+    </div>
+
+    <div class="warn" id="warn"></div>
+    <div class="stage" id="stage"></div>
+  </section>
+
+  <div class="brand" aria-hidden="true">
+    <img src="assets/logo.png" alt="">
+  </div>
+
+  <div class="pvFooter"></div>
+  <script src="../pv-footer.js"></script>
+
+  <script src="config.js"></script>
+
+  <script>
+    /*******************************************************************
+     * 🔑 CHAVE GOOGLE MAPS
+     *******************************************************************/
+    const GOOGLE_MAPS_API_KEY = (window.PONTOVIEW_GMAPS_KEY || "").trim() || "COLE_SUA_API_KEY_AQUI";
+
+    /*******************************************************************
+     * CONFIG
+     *******************************************************************/
+    const STATION = { lat: -19.5368231, lng: -40.633973 };
+    const SWEEP_POINTS = 12;
+    const SWEEP_RADIUS_M = 1200;
+    const REFRESH_EVERY_MS = 10 * 60 * 1000;
+    const TIME_WINDOW_MS = 2 * 60 * 60 * 1000;
+
+    // Paginação
+    const PAGE_DURATION_MS = 12000;
+    const PAGE_PROGRESS_TICK_MS = 120;
+    const MIN_ITEMS_PER_PAGE = 4;
+
+    // ✅ Agrupamento de horários muito próximos (minutos)
+    const CLUSTER_GAP_MIN = 2; // 08:21–08:22 vira range
+
+    /*******************************************************************
+     * UI refs
+     *******************************************************************/
+    const clockEl = document.getElementById("clock");
+    const lastUpdateEl = document.getElementById("lastUpdate");
+    const subStatusEl = document.getElementById("subStatus");
+    const warnEl = document.getElementById("warn");
+    const stageEl = document.getElementById("stage");
+    const pageLabelEl = document.getElementById("pageLabel");
+    const barFillEl = document.getElementById("barFill");
+
+    function pad2(n){ return String(n).padStart(2,"0"); }
+
+    /*******************************************************************
+     * Clock (sem segundos)
+     *******************************************************************/
+    function tickClock(){
+      const d = new Date();
+      clockEl.textContent = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+    }
+    function startClock(){
+      tickClock();
+      const ms = 1000 - new Date().getMilliseconds();
+      setTimeout(() => { tickClock(); setInterval(tickClock, 1000); }, ms);
+    }
+
+    /*******************************************************************
+     * Loader Google Maps
+     *******************************************************************/
+    function loadGoogleMaps(){
+      return new Promise((resolve, reject) => {
+        if (window.google?.maps) return resolve();
+
+        const key = (GOOGLE_MAPS_API_KEY || "").trim();
+        if (!key || key === "COLE_SUA_API_KEY_AQUI"){
+          warnEl.style.display = "block";
+          warnEl.textContent = "INSIRA SUA GOOGLE MAPS API KEY (config.js OU CONSTANTE GOOGLE_MAPS_API_KEY).";
+          return reject(new Error("Missing API key"));
+        }
+
+        const script = document.createElement("script");
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}`;
+        script.async = true;
+        script.defer = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error("Falha ao carregar Google Maps JS API"));
+        document.head.appendChild(script);
+      });
+    }
+
+    /*******************************************************************
+     * Geodesia (destinos invisíveis)
+     *******************************************************************/
+    function toRad(deg){ return deg * Math.PI / 180; }
+    function toDeg(rad){ return rad * 180 / Math.PI; }
+
+    function destinationPoint(lat, lng, bearingDeg, distanceM){
+      const R = 6371000;
+      const brng = toRad(bearingDeg);
+      const dDivR = distanceM / R;
+      const lat1 = toRad(lat);
+      const lon1 = toRad(lng);
+
+      const lat2 = Math.asin(
+        Math.sin(lat1)*Math.cos(dDivR) +
+        Math.cos(lat1)*Math.sin(dDivR)*Math.cos(brng)
+      );
+      const lon2 = lon1 + Math.atan2(
+        Math.sin(brng)*Math.sin(dDivR)*Math.cos(lat1),
+        Math.cos(dDivR) - Math.sin(lat1)*Math.sin(lat2)
+      );
+
+      return { lat: toDeg(lat2), lng: toDeg(lon2) };
+    }
+
+    function buildSweepDestinations(){
+      const points = [];
+      for (let i=0;i<SWEEP_POINTS;i++){
+        const bearing = i * (360 / SWEEP_POINTS);
+        points.push(destinationPoint(STATION.lat, STATION.lng, bearing, SWEEP_RADIUS_M));
+      }
+      return points;
+    }
+
+    /*******************************************************************
+     * Empresa por número
+     *******************************************************************/
+    function companyFromLineNumber(lineShort){
+      const n = parseInt(String(lineShort).replace(/\D/g,""), 10);
+      if (!Number.isFinite(n)) return { code:"VJD", color:"var(--vjd)" };
+      if (n >= 300 && n <= 499) return { code:"VSR", color:"var(--vsr)" };
+      return { code:"VJD", color:"var(--vjd)" };
+    }
+
+    /*******************************************************************
+     * Parsing Directions (SAÍDA somente)
+     *******************************************************************/
+    function toMillis(v){
+      if (!v) return null;
+      if (v instanceof Date) return v.getTime();
+      if (typeof v === "number"){
+        if (v > 1e12) return v;       // ms
+        if (v > 1e9)  return v*1000;  // s
+      }
+      if (typeof v === "object" && v.value) return toMillis(v.value);
+      return null;
+    }
+
+    function extractTripsFromDirectionsResult(result){
+      const trips = [];
+      if (!result?.routes?.length) return trips;
+
+      for (const route of result.routes){
+        const leg = route.legs?.[0];
+        if (!leg?.steps?.length) continue;
+
+        for (const step of leg.steps){
+          if (step.travel_mode !== "TRANSIT" || !step.transit) continue;
+
+          const td = step.transit;
+          const lineShort = td.line?.short_name || td.line?.name || "—";
+          const headsign = td.headsign || td.line?.name || td.arrival_stop?.name || "Destino";
+
+          // ✅ Apenas SAÍDA (departure_time)
+          const depMs = toMillis(td.departure_time) || toMillis(td.departure_time?.value);
+          if (!depMs) continue;
+
+          trips.push({
+            line: String(lineShort),
+            destination: String(headsign),
+            timeMs: depMs,
+            key: `${String(lineShort)}|${String(headsign)}|${depMs}`
+          });
+        }
+      }
+      return trips;
+    }
+
+    /*******************************************************************
+     * Dedup + agrupa + janela 2h
+     *******************************************************************/
+    function aggregateTrips(allTrips){
+      const uniqMap = new Map();
+      for (const t of allTrips) uniqMap.set(t.key, t);
+      const uniq = Array.from(uniqMap.values());
+
+      const now = Date.now();
+      const end = now + TIME_WINDOW_MS;
+
+      const groups = new Map();
+      for (const t of uniq){
+        if (t.timeMs < now - 20_000) continue;
+        if (t.timeMs > end) continue;
+
+        const gKey = `${t.line}||${t.destination}`;
+        if (!groups.has(gKey)) groups.set(gKey, { line: t.line, destination: t.destination, times: [] });
+        groups.get(gKey).times.push(t.timeMs);
+      }
+
+      const cards = [];
+      for (const g of groups.values()){
+        g.times.sort((a,b) => a-b);
+        if (!g.times.length) continue;
+
+        cards.push({
+          line: g.line,
+          destination: g.destination,
+          times: g.times,
+          nextTime: g.times[0]
+        });
+      }
+
+      cards.sort((a,b) => a.nextTime - b.nextTime);
+      return cards;
+    }
+
+    function fmtHHMM(ms){
+      const d = new Date(ms);
+      return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+    }
+
+    function diffMin(aMs, bMs){
+      return Math.round(Math.abs(aMs - bMs) / 60000);
+    }
+
+    // ✅ transforma [08:21,08:22,08:24,09:28] em ["08:21–08:22","08:24","09:28"]
+    function clusterTimes(timesMs){
+      const t = (timesMs || []).slice().sort((a,b)=>a-b);
+      const clusters = [];
+      let current = [t[0]];
+      for (let i=1;i<t.length;i++){
+        if (diffMin(t[i], t[i-1]) <= CLUSTER_GAP_MIN){
+          current.push(t[i]);
+        }else{
+          clusters.push(current);
+          current = [t[i]];
+        }
+      }
+      if (current.length) clusters.push(current);
+
+      return clusters.map(c => {
+        if (c.length === 1) return fmtHHMM(c[0]);
+        return `${fmtHHMM(c[0])}–${fmtHHMM(c[c.length-1])}`;
+      });
+    }
+
+    /*******************************************************************
+     * Directions: 12 requisições
+     *******************************************************************/
+    let directionsService = null;
+    let refreshTimer = null;
+
+    function setStatus(text){ subStatusEl.textContent = text; }
+
+    function requestDirectionsTo(dest){
+      return new Promise((resolve) => {
+        const req = {
+          origin: STATION,
+          destination: dest,
+          travelMode: google.maps.TravelMode.TRANSIT,
+          provideRouteAlternatives: true,
+          transitOptions: { departureTime: new Date() }
+        };
+
+        directionsService.route(req, (result, status) => {
+          if (status === "OK" && result) resolve({ ok:true, result });
+          else resolve({ ok:false, status });
+        });
+      });
+    }
+
+    /*******************************************************************
+     * Paginação + animação
+     *******************************************************************/
+    let currentCards = [];
+    let pages = [];
+    let pageIndex = 0;
+
+    let pageTimer = null;
+    let progressTimer = null;
+    let pageStart = 0;
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, (m) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+
+    function buildCardEl(card){
+      const company = companyFromLineNumber(card.line);
+
+      const el = document.createElement("div");
+      el.className = "card";
+
+      const stripe = document.createElement("div");
+      stripe.className = "stripe";
+      stripe.style.background = company.code === "VSR" ? "var(--vsr)" : "var(--vjd)";
+
+      const dotColor = company.code === "VSR" ? "var(--vsr)" : "var(--vjd)";
+
+      const next = fmtHHMM(card.times[0]);
+
+      // ✅ pílulas agora são "clusters" (ranges) e NÃO duplicam o horário de destaque
+      const rest = card.times.slice(1);
+      const pillTexts = clusterTimes(rest);
+
+      const pillsHtml = pillTexts.map(txt => `<div class="pill">${escapeHtml(txt)}</div>`).join("");
+
+      el.innerHTML = `
+        <div class="lineCol">
+          <div class="lineNum">${escapeHtml(card.line)}</div>
+          <div class="company">
+            <span class="dot" style="background:${dotColor}"></span>
+            <span>${company.code}</span>
+          </div>
+        </div>
+
+        <div class="destCol">
+          <div class="destName">${escapeHtml(card.destination)}</div>
+        </div>
+
+        <div class="timesCol">
+          <div class="next">
+            <div class="when">${next}</div>
+            <div class="label">SAÍDA</div>
+          </div>
+
+          <div class="miniLabel">Próximos horários</div>
+          <div class="pills">${pillsHtml}</div>
+        </div>
+      `;
+      el.prepend(stripe);
+      return el;
+    }
+
+    function clearTimers(){
+      if (pageTimer) clearTimeout(pageTimer);
+      if (progressTimer) clearInterval(progressTimer);
+      pageTimer = null;
+      progressTimer = null;
+    }
+
+    function setPagerLabel(){
+      const total = Math.max(1, pages.length);
+      pageLabelEl.textContent = `PÁGINA ${Math.min(pageIndex+1, total)}/${total}`;
+    }
+
+    function setProgress(p){
+      const pct = Math.max(0, Math.min(100, p));
+      barFillEl.style.width = pct + "%";
+    }
+
+    function measureItemsPerPage(sampleCardEl){
+      const stageRect = stageEl.getBoundingClientRect();
+      const available = stageRect.height;
+
+      const cardRect = sampleCardEl.getBoundingClientRect();
+      const cardH = cardRect.height;
+
+      const gap = 12;
+      let n = Math.floor((available + gap) / (cardH + gap));
+      n = Math.max(MIN_ITEMS_PER_PAGE, n);
+      return n;
+    }
+
+    // ✅ ajusta automaticamente quantas pílulas cabem; se não couber nenhuma, compacta tudo em uma só
+    function fitPillsToWidth(cardEl){
+      const pillsEl = cardEl.querySelector(".pills");
+      if (!pillsEl) return;
+
+      let pills = Array.from(pillsEl.children);
+      if (!pills.length) return;
+
+      const maxW = pillsEl.clientWidth;
+      const gap = parseFloat(getComputedStyle(pillsEl).gap || "0") || 0;
+
+      pills.forEach(p => p.style.display = "");
+
+      let used = 0;
+      let count = 0;
+
+      for (let i = 0; i < pills.length; i++){
+        const w = pills[i].getBoundingClientRect().width;
+        const nextUsed = used + (count > 0 ? gap : 0) + w;
+
+        if (nextUsed <= maxW){
+          used = nextUsed;
+          count++;
+          continue;
+        }
+        break;
+      }
+
+      // Se não coube nenhuma (tela muito estreita), mostra só uma pílula compactada
+      if (count === 0){
+        const all = pills.map(p => p.textContent.trim()).filter(Boolean);
+        pillsEl.innerHTML = `<div class="pill"></div>`;
+        const one = pillsEl.querySelector(".pill");
+        one.textContent = compactTextToWidth(one, all.join(" • "));
+        return;
+      }
+
+      // Esconde as que não couberam
+      for (let i = count; i < pills.length; i++){
+        pills[i].style.display = "none";
+      }
+
+      // Se escondeu alguma, transforma a última visível em "…"
+      const hidden = pills.length - count;
+      if (hidden > 0 && count >= 1){
+        const last = pills[count - 1];
+        const base = last.textContent.trim();
+        last.textContent = compactTextToWidth(last, base + " • …");
+      }
+    }
+
+    // ✅ compacta string para caber dentro de uma pill (com reticências)
+    const __measureCanvas = document.createElement("canvas");
+    const __measureCtx = __measureCanvas.getContext("2d");
+
+    function compactTextToWidth(el, text){
+      const cs = getComputedStyle(el);
+      const font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      __measureCtx.font = font;
+
+      const maxW = Math.max(0, el.clientWidth - 18);
+      if (maxW <= 0) return "…";
+
+      if (__measureCtx.measureText(text).width <= maxW) return text;
+
+      let s = text;
+      while (s.length > 1 && __measureCtx.measureText(s + "…").width > maxW){
+        s = s.slice(0, -1);
+      }
+      return s + "…";
+    }
+
+    function paginateCards(cards){
+      stageEl.innerHTML = "";
+      pages = [];
+      pageIndex = 0;
+
+      if (!cards.length){
+        const p = document.createElement("div");
+        p.className = "page active";
+        p.innerHTML = `<div class="empty">Nenhuma saída encontrada nas próximas 2 horas.</div>`;
+        stageEl.appendChild(p);
+        pages = [p];
+        setPagerLabel();
+        setProgress(100);
+        return;
+      }
+
+      const sample = buildCardEl(cards[0]);
+      const tmp = document.createElement("div");
+      tmp.style.position = "absolute";
+      tmp.style.inset = "var(--pad)";
+      tmp.style.visibility = "hidden";
+      tmp.style.pointerEvents = "none";
+      tmp.style.display = "grid";
+      tmp.style.gap = "12px";
+      tmp.appendChild(sample);
+      stageEl.appendChild(tmp);
+
+      const perPage = measureItemsPerPage(sample);
+      stageEl.removeChild(tmp);
+
+      for (let i=0; i<cards.length; i += perPage){
+        const chunk = cards.slice(i, i+perPage);
+
+        const page = document.createElement("div");
+        page.className = "page";
+        for (const c of chunk){
+          const cardEl = buildCardEl(c);
+          page.appendChild(cardEl);
+
+          // ✅ depois de entrar no DOM, ajusta pílulas conforme largura
+          requestAnimationFrame(() => fitPillsToWidth(cardEl));
+        }
+        stageEl.appendChild(page);
+        pages.push(page);
+      }
+
+      pages[0].classList.add("active");
+      setPagerLabel();
+      startPaging();
+    }
+
+    function showPage(nextIndex){
+      if (!pages.length) return;
+
+      const from = pages[pageIndex];
+      const to = pages[nextIndex];
+      if (from === to) return;
+
+      from.classList.remove("active");
+      from.classList.add("exit");
+
+      to.classList.remove("exit");
+      void to.offsetWidth;
+      to.classList.add("active");
+
+      setTimeout(() => from.classList.remove("exit"), 560);
+
+      pageIndex = nextIndex;
+      setPagerLabel();
+      setProgress(0);
+
+      // ✅ garante ajuste ao trocar página
+      requestAnimationFrame(() => {
+        const active = pages[pageIndex];
+        if (!active) return;
+        active.querySelectorAll(".card").forEach(el => fitPillsToWidth(el));
+      });
+    }
+
+    function startPaging(){
+      clearTimers();
+      if (pages.length <= 1){
+        setProgress(100);
+        return;
+      }
+
+      pageStart = Date.now();
+      setProgress(0);
+
+      progressTimer = setInterval(() => {
+        const elapsed = Date.now() - pageStart;
+        setProgress((elapsed / PAGE_DURATION_MS) * 100);
+      }, PAGE_PROGRESS_TICK_MS);
+
+      pageTimer = setTimeout(() => {
+        const next = (pageIndex + 1) % pages.length;
+        showPage(next);
+        startPaging();
+      }, PAGE_DURATION_MS);
+    }
+
+    /*******************************************************************
+     * Refresh
+     *******************************************************************/
+    async function refreshData(){
+      setStatus("Atualizando saídas…");
+      const t0 = performance.now();
+
+      if (!directionsService) directionsService = new google.maps.DirectionsService();
+
+      const destinations = buildSweepDestinations();
+      const responses = await Promise.all(destinations.map(d => requestDirectionsTo(d)));
+
+      const allTrips = [];
+      let okCount = 0;
+
+      for (const r of responses){
+        if (r.ok){
+          okCount++;
+          allTrips.push(...extractTripsFromDirectionsResult(r.result));
+        }
+      }
+
+      const cards = aggregateTrips(allTrips);
+      currentCards = cards;
+
+      paginateCards(cards);
+
+      const dt = Math.round(performance.now() - t0);
+      const now = new Date();
+      const hhmm = `${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+
+      lastUpdateEl.textContent = `Última atualização • ${hhmm}`;
+
+      if (!okCount){
+        setStatus("Sem resposta da API (verifique a KEY e restrições).");
+      } else {
+        setStatus(`Próximas saídas • ${cards.length} linhas`);
+      }
+    }
+
+    function scheduleRefresh(){
+      if (refreshTimer) clearInterval(refreshTimer);
+      refreshTimer = setInterval(refreshData, REFRESH_EVERY_MS);
+    }
+
+    /*******************************************************************
+     * BOOT
+     *******************************************************************/
+    startClock();
+
+    (async function boot(){
+      try{
+        setStatus("Carregando Google Maps…");
+        await loadGoogleMaps();
+        warnEl.style.display = "none";
+        await refreshData();
+        scheduleRefresh();
+
+        window.addEventListener("resize", () => paginateCards(currentCards || []));
+      }catch(err){
+        console.warn(err);
+        setStatus("Aguardando API Key…");
+      }
+    })();
+  </script>
+</body>
+</html>
