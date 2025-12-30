@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Next Bus • Painel</title>
+  <title>Horários de Saída • Ônibus</title>
 
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -949,7 +949,7 @@
 
     function startDemoLoop(){
       stationTitleEl.textContent = (PV_CONFIG.STATION_TITLE || "Estação Central").trim();
-      panelInfoEl.textContent = `Próximas saídas (${PV_CONFIG.TIME_WINDOW_HOURS}h) • Next Bus`;
+      panelInfoEl.textContent = `Janela (${PV_CONFIG.TIME_WINDOW_HOURS}h) • Next Bus`;
       setStatus(`Próximas saídas • ${PV_CONFIG.DEMO_LINES_COUNT} linhas`);
 
       const render = () => {
@@ -1005,11 +1005,12 @@
 
       // (mantido aqui para quando você quiser integrar o online neste mesmo arquivo)
       warnEl.style.display = "block";
-      warnEl.textContent = "MODO ONLINE DESATIVADO NESTA VERSÃO. ATIVE DEMO_MODE OU ME PEÇA PARA INTEGRAR O ONLINE COMPLETO.";
+      warnEl.textContent = "MODO ONLINE DESATIVADO NESTA VERSÃO.";
       setStatus("Aguardando configuração…");
     })();
   </script>
 </body>
 </html>
+
 
 
