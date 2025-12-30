@@ -401,7 +401,7 @@
       text-align:center;
     }
 
-    /* ✅ FOOTER DENTRO DO CARD BRANCO */
+    /* ✅ FOOTER DENTRO DO CARD BRANCO + LOGO */
     .panelFooter{
       border-top: 1px solid var(--stroke2);
       background: #ffffff;
@@ -409,13 +409,14 @@
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap: 12px;
+      gap: 14px;
       min-height: 44px;
     }
-    .panelFooter .left{
+    .pvBrand{
       display:flex;
       align-items:center;
       gap: 10px;
+      flex: 0 0 auto;
       min-width: 0;
     }
     .pvLogo{
@@ -424,25 +425,20 @@
       display:block;
       opacity: .95;
     }
-    .pvFooterText{
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      color: #475569;
+    .pvFooter{
+      flex: 1 1 auto;
+      min-width: 0;
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      overflow:hidden;
+    }
+    /* o pv-footer.js costuma inserir texto/ícones: garantimos que caiba */
+    .pvFooter *{
+      max-width: 100%;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 56vw;
-    }
-    .pvFooterRight{
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      color: #64748b;
-      white-space: nowrap;
-      opacity: .9;
     }
 
     @media (max-width: 980px){
@@ -494,7 +490,6 @@
 
       .panelFooter{ min-height: 40px; padding: 9px var(--pad); }
       .pvLogo{ height: 16px; }
-      .pvFooterText, .pvFooterRight{ font-size: 10px; }
     }
 
     @media (max-width: 640px){
@@ -519,8 +514,6 @@
 
       .pills{ max-width: 170px; }
       .pill{ min-width: 70px; font-size: 10px; }
-
-      .pvFooterText{ max-width: 48vw; }
     }
   </style>
 </head>
@@ -555,21 +548,18 @@
     <div class="warn" id="warn"></div>
     <div class="stage" id="stage"></div>
 
-    <!-- ✅ Footer dentro do card branco -->
+    <!-- ✅ Footer dentro do card branco (logo + pv-footer.js) -->
     <div class="panelFooter">
-      <div class="left">
-        <!-- ✅ sua logo aqui (ajuste o caminho se necessário) -->
+      <div class="pvBrand" aria-hidden="true">
+        <!-- ajuste se sua logo estiver em outro caminho -->
         <img class="pvLogo" src="assets/logo.png" alt="PontoView">
-        <div class="pvFooterText" id="footerText">PontoView</div>
       </div>
-      <div class="pvFooterRight" id="footerRight"> </div>
 
-      <!-- Hook do footer padrão (se você quiser que pv-footer.js injete coisas aqui) -->
-      <div class="pvFooter" style="display:none"></div>
+      <div class="pvFooter"></div>
     </div>
   </section>
 
-  <!-- Mantido conforme você pediu -->
+  <!-- ✅ como você pediu -->
   <script src="../pv-footer.js"></script>
 
   <!-- opcional: config.js (window.PONTOVIEW_GMAPS_KEY = "SUA_CHAVE";) -->
@@ -579,10 +569,10 @@
     /*******************************************************************
      * ✅ ÚNICO CAMPO PADRÃO (se não usar URL)
      *******************************************************************/
-    const DEFAULT_STATION = "582, R. Manoel Andrade, 476 - Centro, São Mateus - ES, 29936-714";
+    const DEFAULT_STATION = "Centro, São Mateus - ES, 29930-500";
 
     /*******************************************************************
-     * ✅ LER CONFIG POR URL (?demo=1&station=...&title=...&window=...)
+     * ✅ CONFIG POR URL (?demo=1&station=...&title=...&window=...)
      *******************************************************************/
     function getQuery(){
       const q = new URLSearchParams(location.search);
@@ -598,12 +588,11 @@
         windowH: Number.isFinite(windowH) && windowH > 0 ? windowH : null
       };
     }
-
     const Q = getQuery();
 
     const PV_CONFIG = {
       STATION_QUERY: Q.station || DEFAULT_STATION,
-      STATION_TITLE: Q.title || "",  // se vazio, tenta montar via Geocoder
+      STATION_TITLE: Q.title || "",
       DEMO_MODE: Q.demo,
 
       TIME_WINDOW_HOURS: Q.windowH || 2,
@@ -625,14 +614,7 @@
         { name:"VIAÇÃO JOANA DARC", color:"#0f3f82" },
         { name:"VIAÇÃO SÃO ROQUE", color:"#5fc2ff" },
         { name:"TRANS COLATINA", color:"#ff7a00" }
-      ],
-
-      AGENCY_COLOR_MAP: {
-        "VIAÇÃO SÃO GABRIEL": "#f3c316",
-        "VIAÇÃO JOANA DARC": "#0f3f82",
-        "VIAÇÃO SÃO ROQUE": "#5fc2ff",
-        "TRANS COLATINA": "#ff7a00"
-      }
+      ]
     };
 
     const GOOGLE_MAPS_API_KEY = (window.PONTOVIEW_GMAPS_KEY || "").trim() || "COLE_SUA_API_KEY_AQUI";
@@ -649,7 +631,6 @@
     const barFillEl = document.getElementById("barFill");
     const stationTitleEl = document.getElementById("stationTitle");
     const panelInfoEl = document.getElementById("panelInfo");
-    const footerTextEl = document.getElementById("footerText");
 
     function pad2(n){ return String(n).padStart(2,"0"); }
     function tickClock(){
@@ -699,7 +680,7 @@
     }
 
     /*******************************************************************
-     * Paginação (✅ ajusta ao espaço real)
+     * Paginação (✅ corrigida)
      *******************************************************************/
     let currentCards = [];
     let pages = [];
@@ -711,10 +692,11 @@
 
     const PAGE_DURATION_MS = 12000;
     const PAGE_PROGRESS_TICK_MS = 120;
-
-    // ✅ não força mínimo 4: deixa o cálculo decidir
     const MIN_ITEMS_PER_PAGE = 1;
-    const MAX_ITEMS_PER_PAGE = 20; // segurança
+    const MAX_ITEMS_PER_PAGE = 24;
+
+    // ✅ repaginar 1x após layout estabilizar (evita loop)
+    let __repaginatedOnce = false;
 
     function clearTimers(){
       if (pageTimer) clearTimeout(pageTimer);
@@ -731,22 +713,31 @@
       barFillEl.style.width = pct + "%";
     }
 
-    function measureItemsPerPage(sampleCardEl){
-      // ✅ usa clientHeight (mais confiável) e desconta paddings do inset da page
-      const stageH = stageEl.clientHeight;
-      const pad = parseFloat(getComputedStyle(stageEl).paddingTop || "0") || 0;
-      const available = Math.max(0, stageH - (pad * 2));
+    function stageContentHeight(){
+      const rect = stageEl.getBoundingClientRect();
+      const cs = getComputedStyle(stageEl);
+      const pt = parseFloat(cs.paddingTop || "0") || 0;
+      const pb = parseFloat(cs.paddingBottom || "0") || 0;
+      return Math.max(0, rect.height - pt - pb);
+    }
 
+    function measureItemsPerPage(sampleCardEl){
+      const available = stageContentHeight();
       const cardH = sampleCardEl.getBoundingClientRect().height || 90;
-      const gap = parseFloat(getComputedStyle(sampleCardEl.parentElement || stageEl).gap || "12") || 12;
+
+      const gap = 12;
 
       let n = Math.floor((available + gap) / (cardH + gap));
-      n = Math.max(MIN_ITEMS_PER_PAGE, n);
-      n = Math.min(MAX_ITEMS_PER_PAGE, n);
+      n = Math.max(MIN_ITEMS_PER_PAGE, Math.min(MAX_ITEMS_PER_PAGE, n));
+
+      // ✅ correção: se disponível claramente comporta mais que 1, mas n veio 1, recalcula
+      if (n === 1 && available > (cardH * 1.85)){
+        n = Math.floor((available + gap) / (cardH + gap));
+        n = Math.max(2, Math.min(MAX_ITEMS_PER_PAGE, n));
+      }
       return n;
     }
 
-    // medir texto para compactar pílula
     const __measureCanvas = document.createElement("canvas");
     const __measureCtx = __measureCanvas.getContext("2d");
     function compactTextToWidth(el, text){
@@ -874,7 +865,6 @@
         return;
       }
 
-      // ✅ mede com um sample real
       const sample = buildCardEl(cards[0]);
       const tmp = document.createElement("div");
       tmp.style.position = "absolute";
@@ -886,7 +876,8 @@
       tmp.appendChild(sample);
       stageEl.appendChild(tmp);
 
-      const perPage = measureItemsPerPage(sample);
+      let perPage = measureItemsPerPage(sample);
+
       stageEl.removeChild(tmp);
 
       for (let i=0; i<cards.length; i += perPage){
@@ -908,11 +899,16 @@
       setPagerLabel();
       startPaging();
 
-      // ✅ garante reflow depois das fontes/layout (resolve “só 4 itens”)
-      setTimeout(() => {
-        // repagina apenas se a página 1 estiver claramente “sobrando espaço”
-        paginateCards(currentCards || []);
-      }, 250);
+      // ✅ repaginação única após layout/fontes (corrige “1 item por página”)
+      if (!__repaginatedOnce){
+        __repaginatedOnce = true;
+        const reflow = () => requestAnimationFrame(() => paginateCards(currentCards || []));
+        if (document.fonts && document.fonts.ready){
+          document.fonts.ready.then(() => setTimeout(reflow, 0));
+        } else {
+          setTimeout(reflow, 0);
+        }
+      }
     }
 
     function showPage(nextIndex){
@@ -1001,7 +997,6 @@
         }
 
         times.sort((a,b)=>a-b);
-        if (Math.random() < 0.22 && times.length > 1) times.splice(1);
 
         cards.push({
           line,
@@ -1019,13 +1014,12 @@
 
     let demoTimer = null;
     function startDemoLoop(){
-      // título demo: tenta extrair cidade do texto
-      stationTitleEl.textContent = (PV_CONFIG.STATION_TITLE || PV_CONFIG.STATION_QUERY).toUpperCase();
+      stationTitleEl.textContent = (PV_CONFIG.STATION_TITLE || "ESTAÇÃO").toUpperCase();
       panelInfoEl.textContent = `Próximas saídas (${PV_CONFIG.TIME_WINDOW_HOURS}h) • Next Bus`;
-      footerTextEl.textContent = PV_CONFIG.STATION_QUERY;
+      setStatus(`Modo demo • ${PV_CONFIG.DEMO_LINES_COUNT} linhas`);
 
-      setStatus(`Modo demo • Estação configurada`);
       const render = () => {
+        __repaginatedOnce = false;
         currentCards = buildDemoCards();
         paginateCards(currentCards);
 
@@ -1066,19 +1060,14 @@
       return new Promise((resolve, reject) => {
         const geocoder = new google.maps.Geocoder();
         geocoder.geocode({ address: query }, (results, status) => {
-          if (status === "OK" && results && results[0]){
-            resolve(results[0]);
-          } else {
-            reject(new Error("Geocoding falhou: " + status));
-          }
+          if (status === "OK" && results && results[0]) resolve(results[0]);
+          else reject(new Error("Geocoding falhou: " + status));
         });
       });
     }
 
-    // ✅ monta título: "Bairro, Cidade - UF, CEP"
     function buildTitleFromGeocode(geo){
       const ac = geo?.address_components || [];
-
       const pickType = (type) => {
         const found = ac.find(c => (c.types || []).includes(type));
         return found ? (found.long_name || found.short_name || "") : "";
@@ -1107,20 +1096,11 @@
       if (n && c && s) return `${n}, ${c} - ${s}`;
       if (c && s && z) return `${c} - ${s}, ${z}`;
       if (c && s) return `${c} - ${s}`;
-      if (c) return c;
 
-      // fallback: tenta pegar "Centro, São Mateus" do texto do usuário
+      // fallback: “Centro, São Mateus”
       const q = (PV_CONFIG.STATION_QUERY || "").split(",");
       if (q.length >= 2) return `${q[0].trim()}, ${q[1].trim()}`;
       return (PV_CONFIG.STATION_QUERY || "Estação").trim();
-    }
-
-    function normalizeAgencyName(name){
-      return String(name || "").trim().toUpperCase().replace(/\s+/g, " ");
-    }
-    function agencyColor(agencyName){
-      const n = normalizeAgencyName(agencyName);
-      return PV_CONFIG.AGENCY_COLOR_MAP[n] || null;
     }
 
     function toRad(deg){ return deg * Math.PI / 180; }
@@ -1177,15 +1157,12 @@
           if (step.travel_mode !== "TRANSIT" || !step.transit) continue;
 
           const td = step.transit;
-
           const lineShort = td.line?.short_name || td.line?.name || "—";
           const headsign = td.headsign || td.line?.name || td.arrival_stop?.name || "Destino";
 
+          // ✅ apenas saída
           const depMs = toMillis(td.departure_time) || toMillis(td.departure_time?.value);
-          const arrMs = toMillis(td.arrival_time) || toMillis(td.arrival_time?.value);
-
-          // ✅ somente “saída”
-          const timeMs = depMs || arrMs;
+          const timeMs = depMs || null;
           if (!timeMs) continue;
 
           const agency =
@@ -1193,17 +1170,14 @@
             td.line?.name ||
             "";
 
-          const color =
-            td.line?.color ||
-            agencyColor(agency) ||
-            null;
+          const color = td.line?.color || null;
 
           trips.push({
             line: String(lineShort).replace(/\s+/g," ").trim(),
             destination: String(headsign).replace(/\s+/g," ").trim(),
             timeMs,
             agency: String(agency || "").trim(),
-            lineColor: color,
+            lineColor: color || "#0f3f82",
             key: `${String(lineShort)}|${String(headsign)}|${timeMs}|${String(agency||"")}`
           });
         }
@@ -1230,7 +1204,7 @@
             line: t.line,
             destination: t.destination,
             agency: t.agency || "",
-            lineColor: t.lineColor || agencyColor(t.agency) || "#0f3f82",
+            lineColor: t.lineColor || "#0f3f82",
             times: []
           });
         }
@@ -1300,6 +1274,8 @@
 
       const cards = aggregateTrips(allTrips);
       currentCards = cards;
+
+      __repaginatedOnce = false;
       paginateCards(cards);
 
       const dt = Math.round(performance.now() - t0);
@@ -1326,12 +1302,11 @@
     (async function boot(){
       try{
         panelInfoEl.textContent = `Próximas saídas (${PV_CONFIG.TIME_WINDOW_HOURS}h) • Next Bus`;
-        footerTextEl.textContent = PV_CONFIG.STATION_QUERY;
 
         if (PV_CONFIG.DEMO_MODE){
           warnEl.style.display = "none";
           startDemoLoop();
-          window.addEventListener("resize", () => paginateCards(currentCards || []));
+          window.addEventListener("resize", () => { __repaginatedOnce=false; paginateCards(currentCards||[]); });
           return;
         }
 
@@ -1343,7 +1318,7 @@
         const loc = geo.geometry.location;
         stationLatLng = { lat: loc.lat(), lng: loc.lng() };
 
-        // ✅ título: prioridade URL (?title), senão monta via Geocoder
+        // ✅ título: prioridade ?title, senão geocoder, senão “Centro, São Mateus”
         if (PV_CONFIG.STATION_TITLE){
           stationTitleEl.textContent = PV_CONFIG.STATION_TITLE.toUpperCase();
         } else {
@@ -1355,13 +1330,12 @@
         await refreshOnline();
         scheduleOnline();
 
-        window.addEventListener("resize", () => paginateCards(currentCards || []));
+        window.addEventListener("resize", () => { __repaginatedOnce=false; paginateCards(currentCards||[]); });
       }catch(err){
         console.warn(err);
         warnEl.style.display = "block";
         warnEl.textContent = "ERRO AO INICIAR. VERIFIQUE INTERNET, API KEY E O ENDEREÇO (station).";
 
-        // fallback do título: tenta "Centro, São Mateus"
         const q = (PV_CONFIG.STATION_QUERY || "").split(",");
         stationTitleEl.textContent = (q.length >= 2 ? `${q[0].trim()}, ${q[1].trim()}` : (PV_CONFIG.STATION_QUERY || "Estação")).toUpperCase();
 
@@ -1371,4 +1345,3 @@
   </script>
 </body>
 </html>
-
