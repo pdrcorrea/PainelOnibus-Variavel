@@ -260,6 +260,7 @@
       gap: 10px;
       align-items:flex-start;
       padding-left: 10px;
+      min-width: 0;
     }
     .lineNum{
       font-size: 38px;
@@ -269,7 +270,7 @@
       color: #0b1220;
     }
 
-    /* ✅ Empresa mais discreta e sem conflito com o destino */
+    /* Empresa mais discreta */
     .company{
       display:inline-flex;
       align-items:center;
@@ -399,34 +400,6 @@
       text-align:center;
     }
 
-    /* ✅ fallback de logo no footer (se pv-footer.js não injetar nada) */
-    .pvFooter{
-      position: fixed;
-      left: 0; right: 0;
-      bottom: 0;
-      padding: 10px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      pointer-events:none;
-      z-index: 1200;
-    }
-    .pvFooterFallback{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      opacity: .55;
-      filter: drop-shadow(0 10px 18px rgba(0,0,0,.12));
-    }
-    .pvFooterFallback img{ height: 18px; width:auto; display:block; }
-    .pvFooterFallback span{
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,.9);
-    }
-
     @media (max-width: 980px){
       body{ padding: 10px; }
       .panel{ width: 98vw; height: calc(100vh - 20px); }
@@ -472,9 +445,6 @@
 
       .pills{ max-width: 200px; gap: 7px; }
       .pill{ padding: 7px 9px; min-width: 78px; font-size: 11px; }
-
-      .pvFooterFallback img{ height: 16px; }
-      .pvFooterFallback span{ font-size: 10px; }
     }
 
     @media (max-width: 640px){
@@ -511,7 +481,7 @@
           <span class="material-icons-outlined">directions_bus</span>
         </div>
         <div class="titleBlock">
-          <div class="title" id="stationTitle">Estação Central</div>
+          <div class="title" id="stationTitle">Estação</div>
           <div class="sub" id="subStatus">Carregando…</div>
         </div>
       </div>
@@ -534,29 +504,39 @@
     <div class="stage" id="stage"></div>
   </section>
 
-  <!-- ✅ Footer padrão PontoView -->
-  <div class="pvFooter" id="pvFooter"></div>
+  <!-- ✅ footer do seu padrão -->
+  <div class="pvFooter"></div>
   <script src="../pv-footer.js"></script>
 
-  <!-- opcional: config.js (window.PONTOVIEW_GMAPS_KEY = "SUA_CHAVE";) -->
+  <!-- opcional: config.js  (window.PONTOVIEW_GMAPS_KEY = "SUA_CHAVE"; ) -->
   <script src="config.js"></script>
 
   <script>
     /*******************************************************************
-     * ✅ CONFIG (inclui demo)
+     * ✅ CONFIG ÚNICA DO CLIENTE
      *******************************************************************/
     const PV_CONFIG = {
-      DEMO_MODE: false, // true = offline | false = online (Google)
+      // ✅ troque só isso para usar em qualquer cidade
+      STATION_QUERY: "Rua Manoel Andrade, 14 - Igreja Velha, Colatina - ES",
+      STATION_TITLE: "IGREJA VELHA", // "" para usar nome do Google
 
-      STATION_QUERY: "Rua Manoel Andrade, 14 - IGREJA VELHA",
-      STATION_TITLE: "IGREJA VELHA",
+      // ✅ modo demo (sem internet)
+      DEMO_MODE: false,
 
+      // janela e atualização
       TIME_WINDOW_HOURS: 2,
-      CLUSTER_GAP_MIN: 2,
-      PAST_TOLERANCE_MS: 20000,
+      REFRESH_EVERY_MIN: 10,
 
+      // varredura 360º (online)
+      SWEEP_POINTS: 12,
+      SWEEP_RADIUS_M: 1200,
+
+      // agrupar horários muito próximos (evitar “1 minuto” em várias pílulas)
+      CLUSTER_GAP_MIN: 2,
+
+      // DEMO
       DEMO_LINES_COUNT: 18,
-      DEMO_PAGE_REFRESH_SEC: 25,
+      DEMO_REFRESH_SEC: 25,
       DEMO_HEADSIGN_POOL: [
         "COHAB","AROEIRA","SANTA TEREZA","GURIRI VIA BEIRA-MAR","CENTRO","BAIRRO INDUSTRIAL",
         "MARIA ISMÊNIA","MORADA DO SOL","COLATINA VELHA","SÃO SILVANO","RIVIERA","AYRTON SENNA"
@@ -566,11 +546,25 @@
         { name:"VIAÇÃO JOANA DARC", color:"#0f3f82" },
         { name:"VIAÇÃO SÃO ROQUE", color:"#5fc2ff" },
         { name:"TRANS COLATINA", color:"#ff7a00" }
-      ]
+      ],
+
+      // ✅ mapeamento opcional para cores (online) quando a API não trouxer cor
+      AGENCY_COLOR_MAP: {
+        "VIAÇÃO SÃO GABRIEL": "#f3c316",
+        "VIAÇÃO JOANA DARC": "#0f3f82",
+        "VIAÇÃO SÃO ROQUE": "#5fc2ff",
+        "TRANS COLATINA": "#ff7a00"
+      }
     };
 
+    /*******************************************************************
+     * 🔑 CHAVE GOOGLE MAPS
+     *******************************************************************/
     const GOOGLE_MAPS_API_KEY = (window.PONTOVIEW_GMAPS_KEY || "").trim() || "COLE_SUA_API_KEY_AQUI";
 
+    /*******************************************************************
+     * UI refs
+     *******************************************************************/
     const clockEl = document.getElementById("clock");
     const lastUpdateEl = document.getElementById("lastUpdate");
     const subStatusEl = document.getElementById("subStatus");
@@ -581,8 +575,10 @@
     const stationTitleEl = document.getElementById("stationTitle");
     const panelInfoEl = document.getElementById("panelInfo");
 
+    /*******************************************************************
+     * Clock
+     *******************************************************************/
     function pad2(n){ return String(n).padStart(2,"0"); }
-
     function tickClock(){
       const d = new Date();
       clockEl.textContent = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
@@ -593,6 +589,10 @@
       setTimeout(() => { tickClock(); setInterval(tickClock, 1000); }, ms);
     }
 
+    /*******************************************************************
+     * Utils
+     *******************************************************************/
+    function setStatus(t){ subStatusEl.textContent = t; }
     function escapeHtml(s){
       return String(s).replace(/[&<>"']/g, (m) => ({
         "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
@@ -608,8 +608,6 @@
     function diffMin(aMs, bMs){
       return Math.round(Math.abs(aMs - bMs) / 60000);
     }
-
-    function setStatus(text){ subStatusEl.textContent = text; }
 
     function clusterTimes(timesMs){
       const t = (timesMs || []).slice().sort((a,b)=>a-b);
@@ -662,17 +660,21 @@
       const pct = Math.max(0, Math.min(100, p));
       barFillEl.style.width = pct + "%";
     }
+
     function measureItemsPerPage(sampleCardEl){
       const stageRect = stageEl.getBoundingClientRect();
       const available = stageRect.height;
+
       const cardRect = sampleCardEl.getBoundingClientRect();
       const cardH = cardRect.height;
+
       const gap = 12;
       let n = Math.floor((available + gap) / (cardH + gap));
       n = Math.max(MIN_ITEMS_PER_PAGE, n);
       return n;
     }
 
+    // medir texto para compactar pílula
     const __measureCanvas = document.createElement("canvas");
     const __measureCtx = __measureCanvas.getContext("2d");
     function compactTextToWidth(el, text){
@@ -691,6 +693,7 @@
       return s + "…";
     }
 
+    // ✅ quantidade de pílulas conforme largura
     function fitPillsToWidth(cardEl){
       const pillsEl = cardEl.querySelector(".pills");
       if (!pillsEl) return;
@@ -899,37 +902,29 @@
       const lines = new Set();
       while (lines.size < PV_CONFIG.DEMO_LINES_COUNT){
         const base = Math.random() < 0.30 ? randInt(300, 499) : randInt(1, 199);
-        lines.add(String(base).padStart(2, "0")); // no demo, deixa mais “urbano”
+        lines.add(String(base).padStart(2, "0"));
       }
 
       const cards = [];
       for (const line of lines){
         const dest = pick(PV_CONFIG.DEMO_HEADSIGN_POOL);
-
         const agency = pick(PV_CONFIG.DEMO_AGENCIES);
-        const lineColor = agency.color;
 
         const times = [];
         let t = now + randInt(2, 18) * 60 * 1000;
 
         const createClose = Math.random() < 0.25;
-
         while (t <= end){
           times.push(t);
-
           if (createClose && Math.random() < 0.25){
             const t2 = t + randInt(1, 2) * 60 * 1000;
             if (t2 <= end) times.push(t2);
           }
-
           t += randInt(6, 36) * 60 * 1000;
         }
 
         times.sort((a,b)=>a-b);
-
-        if (Math.random() < 0.22 && times.length > 1){
-          times.splice(1);
-        }
+        if (Math.random() < 0.22 && times.length > 1) times.splice(1);
 
         cards.push({
           line,
@@ -937,7 +932,7 @@
           times,
           nextTime: times[0],
           agency: agency.name,
-          lineColor
+          lineColor: agency.color
         });
       }
 
@@ -946,10 +941,9 @@
     }
 
     let demoTimer = null;
-
     function startDemoLoop(){
-      stationTitleEl.textContent = (PV_CONFIG.STATION_TITLE || "Estação Central").trim();
-      panelInfoEl.textContent = `Janela (${PV_CONFIG.TIME_WINDOW_HOURS}h) • Next Bus`;
+      stationTitleEl.textContent = (PV_CONFIG.STATION_TITLE || "Estação").trim() || "Estação";
+      panelInfoEl.textContent = `Próximas saídas (${PV_CONFIG.TIME_WINDOW_HOURS}h) • Next Bus`;
       setStatus(`Próximas saídas • ${PV_CONFIG.DEMO_LINES_COUNT} linhas`);
 
       const render = () => {
@@ -963,54 +957,302 @@
 
       render();
       if (demoTimer) clearInterval(demoTimer);
-      demoTimer = setInterval(render, PV_CONFIG.DEMO_PAGE_REFRESH_SEC * 1000);
+      demoTimer = setInterval(render, PV_CONFIG.DEMO_REFRESH_SEC * 1000);
     }
 
     /*******************************************************************
-     * Footer fallback (logo) — caso pv-footer.js não injete nada
+     * ONLINE (Google Maps)
      *******************************************************************/
-    function ensureFooterLogo(){
-      const footer = document.getElementById("pvFooter");
-      if (!footer) return;
+    function loadGoogleMaps(){
+      return new Promise((resolve, reject) => {
+        if (window.google?.maps) return resolve();
 
-      // espera um pouco pro pv-footer.js preencher
-      setTimeout(() => {
-        const hasContent = footer.textContent.trim().length > 0 || footer.querySelector("img,svg,a,span,div");
-        if (hasContent) return;
+        const key = (GOOGLE_MAPS_API_KEY || "").trim();
+        if (!key || key === "COLE_SUA_API_KEY_AQUI"){
+          warnEl.style.display = "block";
+          warnEl.textContent = "INSIRA SUA GOOGLE MAPS API KEY (config.js OU CONSTANTE GOOGLE_MAPS_API_KEY).";
+          return reject(new Error("Missing API key"));
+        }
 
-        // ✅ fallback mínimo com logo + texto
-        // 👉 TROQUE o src abaixo se sua logo estiver em outro caminho
-        footer.innerHTML = `
-          <div class="pvFooterFallback" aria-hidden="true">
-            <img src="assets/logo.png" alt="">
-          </div>
-        `;
-      }, 300);
+        const script = document.createElement("script");
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}`;
+        script.async = true;
+        script.defer = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error("Falha ao carregar Google Maps JS API"));
+        document.head.appendChild(script);
+      });
+    }
+
+    function geocodeStation(query){
+      return new Promise((resolve, reject) => {
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ address: query }, (results, status) => {
+          if (status === "OK" && results && results[0]){
+            resolve(results[0]);
+          } else {
+            reject(new Error("Geocoding falhou: " + status));
+          }
+        });
+      });
+    }
+
+    // geodesia (pontos em volta)
+    function toRad(deg){ return deg * Math.PI / 180; }
+    function toDeg(rad){ return rad * 180 / Math.PI; }
+
+    function destinationPoint(lat, lng, bearingDeg, distanceM){
+      const R = 6371000;
+      const brng = toRad(bearingDeg);
+      const dDivR = distanceM / R;
+      const lat1 = toRad(lat);
+      const lon1 = toRad(lng);
+
+      const lat2 = Math.asin(
+        Math.sin(lat1)*Math.cos(dDivR) +
+        Math.cos(lat1)*Math.sin(dDivR)*Math.cos(brng)
+      );
+      const lon2 = lon1 + Math.atan2(
+        Math.sin(brng)*Math.sin(dDivR)*Math.cos(lat1),
+        Math.cos(dDivR) - Math.sin(lat1)*Math.sin(lat2)
+      );
+
+      return { lat: toDeg(lat2), lng: toDeg(lon2) };
+    }
+
+    function buildSweepDestinations(station){
+      const points = [];
+      for (let i=0;i<PV_CONFIG.SWEEP_POINTS;i++){
+        const bearing = i * (360 / PV_CONFIG.SWEEP_POINTS);
+        points.push(destinationPoint(station.lat, station.lng, bearing, PV_CONFIG.SWEEP_RADIUS_M));
+      }
+      return points;
+    }
+
+    // parsing directions
+    function toMillis(v){
+      if (!v) return null;
+      if (v instanceof Date) return v.getTime();
+      if (typeof v === "number"){
+        if (v > 1e12) return v;
+        if (v > 1e9)  return v*1000;
+      }
+      if (typeof v === "object" && v.value) return toMillis(v.value);
+      return null;
+    }
+
+    function normalizeAgencyName(name){
+      return String(name || "").trim().toUpperCase().replace(/\s+/g, " ");
+    }
+
+    function agencyColor(agencyName){
+      const n = normalizeAgencyName(agencyName);
+      return PV_CONFIG.AGENCY_COLOR_MAP[n] || null;
+    }
+
+    function extractTripsFromDirectionsResult(result){
+      const trips = [];
+      if (!result?.routes?.length) return trips;
+
+      for (const route of result.routes){
+        const leg = route.legs?.[0];
+        if (!leg?.steps?.length) continue;
+
+        for (const step of leg.steps){
+          if (step.travel_mode !== "TRANSIT" || !step.transit) continue;
+
+          const td = step.transit;
+
+          const lineShort = td.line?.short_name || td.line?.name || "—";
+          const headsign = td.headsign || td.line?.name || td.arrival_stop?.name || "Destino";
+
+          // saída/chegada
+          const depMs = toMillis(td.departure_time) || toMillis(td.departure_time?.value);
+          const arrMs = toMillis(td.arrival_time) || toMillis(td.arrival_time?.value);
+
+          // ✅ para “horários de saída”, prioriza departure_time
+          const timeMs = depMs || arrMs;
+          if (!timeMs) continue;
+
+          // empresa / agência
+          const agency =
+            td.line?.agencies?.[0]?.name ||
+            td.line?.agencies?.[0]?.phone ||
+            td.line?.agencies?.[0]?.url ||
+            td.line?.name ||
+            "";
+
+          // cor se existir
+          const color =
+            td.line?.color ||
+            agencyColor(agency) ||
+            null;
+
+          trips.push({
+            line: String(lineShort).replace(/\s+/g," ").trim(),
+            destination: String(headsign).replace(/\s+/g," ").trim(),
+            timeMs,
+            agency: String(agency || "").trim(),
+            lineColor: color,
+            key: `${String(lineShort)}|${String(headsign)}|${timeMs}|${String(agency||"")}`
+          });
+        }
+      }
+      return trips;
+    }
+
+    function aggregateTrips(allTrips){
+      // dedup
+      const uniqMap = new Map();
+      for (const t of allTrips) uniqMap.set(t.key, t);
+      const uniq = Array.from(uniqMap.values());
+
+      const now = Date.now();
+      const end = now + PV_CONFIG.TIME_WINDOW_HOURS * 60 * 60 * 1000;
+
+      const groups = new Map();
+      for (const t of uniq){
+        if (t.timeMs < now - 20000) continue;
+        if (t.timeMs > end) continue;
+
+        const gKey = `${t.line}||${t.destination}||${t.agency || ""}`;
+        if (!groups.has(gKey)){
+          groups.set(gKey, {
+            line: t.line,
+            destination: t.destination,
+            agency: t.agency || "",
+            lineColor: t.lineColor || agencyColor(t.agency) || "#0f3f82",
+            times: []
+          });
+        }
+        groups.get(gKey).times.push(t.timeMs);
+      }
+
+      const cards = [];
+      for (const g of groups.values()){
+        g.times.sort((a,b) => a-b);
+        if (!g.times.length) continue;
+
+        cards.push({
+          line: g.line,
+          destination: g.destination,
+          agency: g.agency,
+          lineColor: g.lineColor,
+          times: g.times,
+          nextTime: g.times[0]
+        });
+      }
+
+      cards.sort((a,b) => a.nextTime - b.nextTime);
+      return cards;
+    }
+
+    // Directions varredura
+    let directionsService = null;
+    let refreshTimer = null;
+    let stationLatLng = null;
+
+    function requestDirectionsTo(origin, dest){
+      return new Promise((resolve) => {
+        const req = {
+          origin,
+          destination: dest,
+          travelMode: google.maps.TravelMode.TRANSIT,
+          provideRouteAlternatives: true,
+          transitOptions: { departureTime: new Date() }
+        };
+
+        directionsService.route(req, (result, status) => {
+          if (status === "OK" && result) resolve({ ok:true, result });
+          else resolve({ ok:false, status });
+        });
+      });
+    }
+
+    async function refreshOnline(){
+      if (!stationLatLng) return;
+
+      setStatus("Buscando linhas (varredura 360º)…");
+      const t0 = performance.now();
+
+      if (!directionsService) directionsService = new google.maps.DirectionsService();
+
+      const destinations = buildSweepDestinations(stationLatLng);
+      const responses = await Promise.all(destinations.map(d => requestDirectionsTo(stationLatLng, d)));
+
+      const allTrips = [];
+      let okCount = 0;
+
+      for (const r of responses){
+        if (r.ok){
+          okCount++;
+          allTrips.push(...extractTripsFromDirectionsResult(r.result));
+        }
+      }
+
+      const cards = aggregateTrips(allTrips);
+      currentCards = cards;
+      paginateCards(cards);
+
+      const dt = Math.round(performance.now() - t0);
+      const now = new Date();
+      lastUpdateEl.textContent = `Última atualização • ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+
+      if (!okCount){
+        setStatus("Sem resposta da API (verifique KEY/restrições).");
+      } else {
+        setStatus(`Linhas: ${cards.length} • OK: ${okCount}/${PV_CONFIG.SWEEP_POINTS} • ${dt}ms`);
+      }
+    }
+
+    function scheduleOnline(){
+      if (refreshTimer) clearInterval(refreshTimer);
+      refreshTimer = setInterval(refreshOnline, PV_CONFIG.REFRESH_EVERY_MIN * 60 * 1000);
     }
 
     /*******************************************************************
      * BOOT
      *******************************************************************/
     startClock();
-    ensureFooterLogo();
 
-    (function boot(){
-      if (PV_CONFIG.DEMO_MODE){
+    (async function boot(){
+      try{
+        stationTitleEl.textContent = (PV_CONFIG.STATION_TITLE || "Estação").trim() || "Estação";
+        panelInfoEl.textContent = `Próximas saídas (${PV_CONFIG.TIME_WINDOW_HOURS}h) • Next Bus`;
+
+        if (PV_CONFIG.DEMO_MODE){
+          warnEl.style.display = "none";
+          startDemoLoop();
+          window.addEventListener("resize", () => paginateCards(currentCards || []));
+          return;
+        }
+
+        setStatus("Carregando Google Maps…");
+        await loadGoogleMaps();
+
+        setStatus("Localizando ponto…");
+        const geo = await geocodeStation(PV_CONFIG.STATION_QUERY);
+        const loc = geo.geometry.location;
+        stationLatLng = { lat: loc.lat(), lng: loc.lng() };
+
+        // se o usuário deixou título em branco, usa o do Google
+        if (!String(PV_CONFIG.STATION_TITLE || "").trim()){
+          stationTitleEl.textContent = (geo.formatted_address || "Estação").split(",")[0].toUpperCase();
+        }
+
         warnEl.style.display = "none";
-        startDemoLoop();
-        window.addEventListener("resize", () => paginateCards(currentCards || []));
-        return;
-      }
+        setStatus("Atualizando linhas…");
+        await refreshOnline();
+        scheduleOnline();
 
-      // (mantido aqui para quando você quiser integrar o online neste mesmo arquivo)
-      warnEl.style.display = "block";
-      warnEl.textContent = "MODO ONLINE DESATIVADO NESTA VERSÃO.";
-      setStatus("Aguardando configuração…");
+        window.addEventListener("resize", () => paginateCards(currentCards || []));
+      }catch(err){
+        console.warn(err);
+        warnEl.style.display = "block";
+        warnEl.textContent = "ERRO AO INICIAR. VERIFIQUE INTERNET, API KEY E O ENDEREÇO (STATION_QUERY).";
+        setStatus("Aguardando configuração…");
+      }
     })();
   </script>
 </body>
 </html>
-
-
-
-
