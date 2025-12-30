@@ -35,6 +35,8 @@
       --bar2: #34c6d0;
 
       --header: linear-gradient(180deg, #2f6f9d 0%, #184c75 55%, #0f3b5e 100%);
+
+      --stageGap: 12px;
     }
 
     *{ box-sizing:border-box; }
@@ -72,6 +74,7 @@
     }
     @keyframes inPanel{ to{ opacity:1; transform: translateY(0);} }
 
+    /* HEADER */
     .header{
       padding: 14px var(--pad);
       background: var(--header);
@@ -142,6 +145,7 @@
       opacity: .92;
     }
 
+    /* TOP STRIP */
     .panelTop{
       padding: 12px var(--pad);
       background: #f3f7ff;
@@ -159,7 +163,6 @@
       text-transform: uppercase;
       color: #1f2a44;
     }
-
     .pager{
       display:flex;
       align-items:center;
@@ -200,6 +203,7 @@
       text-transform: uppercase;
     }
 
+    /* STAGE */
     .stage{
       position:relative;
       flex: 1;
@@ -213,7 +217,7 @@
       position:absolute;
       inset: var(--pad);
       display:grid;
-      gap: 12px;
+      gap: var(--stageGap);
       align-content:start;
       opacity:0;
       transform: translateX(18px);
@@ -260,7 +264,7 @@
       gap: 10px;
       align-items:flex-start;
       padding-left: 10px;
-      min-width: 0;
+      min-width:0;
     }
     .lineNum{
       font-size: 38px;
@@ -270,7 +274,6 @@
       color: #0b1220;
     }
 
-    /* Empresa mais discreta */
     .company{
       display:inline-flex;
       align-items:center;
@@ -284,12 +287,10 @@
       border-radius: 999px;
       border: 1px solid var(--stroke2);
       background: #f8fbff;
-
       max-width: 165px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-
       opacity: .92;
     }
     .dot{
@@ -400,6 +401,50 @@
       text-align:center;
     }
 
+    /* ✅ FOOTER DENTRO DO CARD BRANCO */
+    .panelFooter{
+      border-top: 1px solid var(--stroke2);
+      background: #ffffff;
+      padding: 10px var(--pad);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      min-height: 44px;
+    }
+    .panelFooter .left{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .pvLogo{
+      height: 18px;
+      width:auto;
+      display:block;
+      opacity: .95;
+    }
+    .pvFooterText{
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: #475569;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 56vw;
+    }
+    .pvFooterRight{
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: #64748b;
+      white-space: nowrap;
+      opacity: .9;
+    }
+
     @media (max-width: 980px){
       body{ padding: 10px; }
       .panel{ width: 98vw; height: calc(100vh - 20px); }
@@ -419,7 +464,7 @@
       .page{ inset: 12px; gap: 10px; }
 
       .card{
-        min-height: 76px;
+        min-height: 74px;
         padding: 12px 14px;
         gap: 12px;
         grid-template-columns: 96px 1fr 210px;
@@ -441,10 +486,15 @@
       .next{ max-width: 200px; padding: 9px 10px; border-radius: 12px; }
       .next .when{ font-size: 28px; }
       .next .label{ font-size: 10px; margin-top: 5px; }
+
       .miniLabel{ max-width: 200px; font-size: 10px; }
 
       .pills{ max-width: 200px; gap: 7px; }
       .pill{ padding: 7px 9px; min-width: 78px; font-size: 11px; }
+
+      .panelFooter{ min-height: 40px; padding: 9px var(--pad); }
+      .pvLogo{ height: 16px; }
+      .pvFooterText, .pvFooterRight{ font-size: 10px; }
     }
 
     @media (max-width: 640px){
@@ -457,7 +507,7 @@
       .card{
         grid-template-columns: 86px 1fr 180px;
         padding: 11px 12px;
-        min-height: 70px;
+        min-height: 68px;
       }
       .lineNum{ font-size: 26px; }
       .company{ max-width: 120px; }
@@ -469,6 +519,8 @@
 
       .pills{ max-width: 170px; }
       .pill{ min-width: 70px; font-size: 10px; }
+
+      .pvFooterText{ max-width: 48vw; }
     }
   </style>
 </head>
@@ -502,39 +554,66 @@
 
     <div class="warn" id="warn"></div>
     <div class="stage" id="stage"></div>
+
+    <!-- ✅ Footer dentro do card branco -->
+    <div class="panelFooter">
+      <div class="left">
+        <!-- ✅ sua logo aqui (ajuste o caminho se necessário) -->
+        <img class="pvLogo" src="assets/logo.png" alt="PontoView">
+        <div class="pvFooterText" id="footerText">PontoView</div>
+      </div>
+      <div class="pvFooterRight" id="footerRight"> </div>
+
+      <!-- Hook do footer padrão (se você quiser que pv-footer.js injete coisas aqui) -->
+      <div class="pvFooter" style="display:none"></div>
+    </div>
   </section>
 
-  <!-- ✅ footer do seu padrão -->
-  <div class="pvFooter"></div>
+  <!-- Mantido conforme você pediu -->
   <script src="../pv-footer.js"></script>
 
-  <!-- opcional: config.js  (window.PONTOVIEW_GMAPS_KEY = "SUA_CHAVE"; ) -->
+  <!-- opcional: config.js (window.PONTOVIEW_GMAPS_KEY = "SUA_CHAVE";) -->
   <script src="config.js"></script>
 
   <script>
     /*******************************************************************
-     * ✅ CONFIG ÚNICA DO CLIENTE
+     * ✅ ÚNICO CAMPO PADRÃO (se não usar URL)
      *******************************************************************/
+    const DEFAULT_STATION = "Centro, São Mateus - ES, 29930-500";
+
+    /*******************************************************************
+     * ✅ LER CONFIG POR URL (?demo=1&station=...&title=...&window=...)
+     *******************************************************************/
+    function getQuery(){
+      const q = new URLSearchParams(location.search);
+      const station = (q.get("station") || "").trim();
+      const title = (q.get("title") || "").trim();
+      const demo = (q.get("demo") || "").trim();
+      const windowH = parseFloat((q.get("window") || "").trim());
+
+      return {
+        station: station || null,
+        title: title || null,
+        demo: demo === "1" || demo.toLowerCase() === "true" || demo.toLowerCase() === "demo",
+        windowH: Number.isFinite(windowH) && windowH > 0 ? windowH : null
+      };
+    }
+
+    const Q = getQuery();
+
     const PV_CONFIG = {
-      // ✅ troque só isso para usar em qualquer cidade
-      STATION_QUERY: "Centro, São Mateus - ES, 29930-500",
-      STATION_TITLE: "IGREJA VELHA", // "" para usar nome do Google
+      STATION_QUERY: Q.station || DEFAULT_STATION,
+      STATION_TITLE: Q.title || "",  // se vazio, tenta montar via Geocoder
+      DEMO_MODE: Q.demo,
 
-      // ✅ modo demo (sem internet)
-      DEMO_MODE: false,
-
-      // janela e atualização
-      TIME_WINDOW_HOURS: 2,
+      TIME_WINDOW_HOURS: Q.windowH || 2,
       REFRESH_EVERY_MIN: 10,
 
-      // varredura 360º (online)
       SWEEP_POINTS: 12,
       SWEEP_RADIUS_M: 1200,
 
-      // agrupar horários muito próximos (evitar “1 minuto” em várias pílulas)
       CLUSTER_GAP_MIN: 2,
 
-      // DEMO
       DEMO_LINES_COUNT: 18,
       DEMO_REFRESH_SEC: 25,
       DEMO_HEADSIGN_POOL: [
@@ -548,7 +627,6 @@
         { name:"TRANS COLATINA", color:"#ff7a00" }
       ],
 
-      // ✅ mapeamento opcional para cores (online) quando a API não trouxer cor
       AGENCY_COLOR_MAP: {
         "VIAÇÃO SÃO GABRIEL": "#f3c316",
         "VIAÇÃO JOANA DARC": "#0f3f82",
@@ -557,13 +635,10 @@
       }
     };
 
-    /*******************************************************************
-     * 🔑 CHAVE GOOGLE MAPS
-     *******************************************************************/
     const GOOGLE_MAPS_API_KEY = (window.PONTOVIEW_GMAPS_KEY || "").trim() || "COLE_SUA_API_KEY_AQUI";
 
     /*******************************************************************
-     * UI refs
+     * UI
      *******************************************************************/
     const clockEl = document.getElementById("clock");
     const lastUpdateEl = document.getElementById("lastUpdate");
@@ -574,10 +649,8 @@
     const barFillEl = document.getElementById("barFill");
     const stationTitleEl = document.getElementById("stationTitle");
     const panelInfoEl = document.getElementById("panelInfo");
+    const footerTextEl = document.getElementById("footerText");
 
-    /*******************************************************************
-     * Clock
-     *******************************************************************/
     function pad2(n){ return String(n).padStart(2,"0"); }
     function tickClock(){
       const d = new Date();
@@ -589,9 +662,6 @@
       setTimeout(() => { tickClock(); setInterval(tickClock, 1000); }, ms);
     }
 
-    /*******************************************************************
-     * Utils
-     *******************************************************************/
     function setStatus(t){ subStatusEl.textContent = t; }
     function escapeHtml(s){
       return String(s).replace(/[&<>"']/g, (m) => ({
@@ -625,14 +695,11 @@
       }
       clusters.push(current);
 
-      return clusters.map(c => {
-        if (c.length === 1) return fmtHHMM(c[0]);
-        return `${fmtHHMM(c[0])}–${fmtHHMM(c[c.length-1])}`;
-      });
+      return clusters.map(c => c.length === 1 ? fmtHHMM(c[0]) : `${fmtHHMM(c[0])}–${fmtHHMM(c[c.length-1])}`);
     }
 
     /*******************************************************************
-     * Paginação
+     * Paginação (✅ ajusta ao espaço real)
      *******************************************************************/
     let currentCards = [];
     let pages = [];
@@ -644,7 +711,10 @@
 
     const PAGE_DURATION_MS = 12000;
     const PAGE_PROGRESS_TICK_MS = 120;
-    const MIN_ITEMS_PER_PAGE = 4;
+
+    // ✅ não força mínimo 4: deixa o cálculo decidir
+    const MIN_ITEMS_PER_PAGE = 1;
+    const MAX_ITEMS_PER_PAGE = 20; // segurança
 
     function clearTimers(){
       if (pageTimer) clearTimeout(pageTimer);
@@ -662,15 +732,17 @@
     }
 
     function measureItemsPerPage(sampleCardEl){
-      const stageRect = stageEl.getBoundingClientRect();
-      const available = stageRect.height;
+      // ✅ usa clientHeight (mais confiável) e desconta paddings do inset da page
+      const stageH = stageEl.clientHeight;
+      const pad = parseFloat(getComputedStyle(stageEl).paddingTop || "0") || 0;
+      const available = Math.max(0, stageH - (pad * 2));
 
-      const cardRect = sampleCardEl.getBoundingClientRect();
-      const cardH = cardRect.height;
+      const cardH = sampleCardEl.getBoundingClientRect().height || 90;
+      const gap = parseFloat(getComputedStyle(sampleCardEl.parentElement || stageEl).gap || "12") || 12;
 
-      const gap = 12;
       let n = Math.floor((available + gap) / (cardH + gap));
       n = Math.max(MIN_ITEMS_PER_PAGE, n);
+      n = Math.min(MAX_ITEMS_PER_PAGE, n);
       return n;
     }
 
@@ -693,7 +765,6 @@
       return s + "…";
     }
 
-    // ✅ quantidade de pílulas conforme largura
     function fitPillsToWidth(cardEl){
       const pillsEl = cardEl.querySelector(".pills");
       if (!pillsEl) return;
@@ -753,7 +824,6 @@
       stripe.style.background = stripeColor;
 
       const next = fmtHHMM(card.times[0]);
-
       const rest = card.times.slice(1);
       const pillTexts = clusterTimes(rest);
       const hasNext = pillTexts.length > 0;
@@ -804,6 +874,7 @@
         return;
       }
 
+      // ✅ mede com um sample real
       const sample = buildCardEl(cards[0]);
       const tmp = document.createElement("div");
       tmp.style.position = "absolute";
@@ -811,7 +882,7 @@
       tmp.style.visibility = "hidden";
       tmp.style.pointerEvents = "none";
       tmp.style.display = "grid";
-      tmp.style.gap = "12px";
+      tmp.style.gap = "var(--stageGap)";
       tmp.appendChild(sample);
       stageEl.appendChild(tmp);
 
@@ -836,6 +907,12 @@
       pages[0].classList.add("active");
       setPagerLabel();
       startPaging();
+
+      // ✅ garante reflow depois das fontes/layout (resolve “só 4 itens”)
+      setTimeout(() => {
+        // repagina apenas se a página 1 estiver claramente “sobrando espaço”
+        paginateCards(currentCards || []);
+      }, 250);
     }
 
     function showPage(nextIndex){
@@ -888,7 +965,7 @@
     }
 
     /*******************************************************************
-     * DEMO OFFLINE
+     * DEMO
      *******************************************************************/
     function randInt(min, max){
       return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -936,23 +1013,24 @@
         });
       }
 
-      cards.sort((a,b)=>a.nextTime - b.nextTime);
+      cards.sort((a,b) => a.nextTime - b.nextTime);
       return cards;
     }
 
     let demoTimer = null;
     function startDemoLoop(){
-      stationTitleEl.textContent = (PV_CONFIG.STATION_TITLE || "Estação").trim() || "Estação";
+      // título demo: tenta extrair cidade do texto
+      stationTitleEl.textContent = (PV_CONFIG.STATION_TITLE || PV_CONFIG.STATION_QUERY).toUpperCase();
       panelInfoEl.textContent = `Próximas saídas (${PV_CONFIG.TIME_WINDOW_HOURS}h) • Next Bus`;
-      setStatus(`Próximas saídas • ${PV_CONFIG.DEMO_LINES_COUNT} linhas`);
+      footerTextEl.textContent = PV_CONFIG.STATION_QUERY;
 
+      setStatus(`Modo demo • Estação configurada`);
       const render = () => {
         currentCards = buildDemoCards();
         paginateCards(currentCards);
 
         const d = new Date();
-        const hhmm = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
-        lastUpdateEl.textContent = `Última atualização • ${hhmm}`;
+        lastUpdateEl.textContent = `Última atualização • ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
       };
 
       render();
@@ -961,7 +1039,7 @@
     }
 
     /*******************************************************************
-     * ONLINE (Google Maps)
+     * ONLINE (Google)
      *******************************************************************/
     function loadGoogleMaps(){
       return new Promise((resolve, reject) => {
@@ -997,7 +1075,54 @@
       });
     }
 
-    // geodesia (pontos em volta)
+    // ✅ monta título: "Bairro, Cidade - UF, CEP"
+    function buildTitleFromGeocode(geo){
+      const ac = geo?.address_components || [];
+
+      const pickType = (type) => {
+        const found = ac.find(c => (c.types || []).includes(type));
+        return found ? (found.long_name || found.short_name || "") : "";
+      };
+
+      const neighborhood =
+        pickType("neighborhood") ||
+        pickType("sublocality_level_1") ||
+        pickType("sublocality") ||
+        "";
+
+      const city =
+        pickType("locality") ||
+        pickType("administrative_area_level_2") ||
+        "";
+
+      const state = (ac.find(c => (c.types || []).includes("administrative_area_level_1"))?.short_name) || "";
+      const cep = pickType("postal_code") || "";
+
+      const n = String(neighborhood || "").trim();
+      const c = String(city || "").trim();
+      const s = String(state || "").trim();
+      const z = String(cep || "").trim();
+
+      if (n && c && s && z) return `${n}, ${c} - ${s}, ${z}`;
+      if (n && c && s) return `${n}, ${c} - ${s}`;
+      if (c && s && z) return `${c} - ${s}, ${z}`;
+      if (c && s) return `${c} - ${s}`;
+      if (c) return c;
+
+      // fallback: tenta pegar "Centro, São Mateus" do texto do usuário
+      const q = (PV_CONFIG.STATION_QUERY || "").split(",");
+      if (q.length >= 2) return `${q[0].trim()}, ${q[1].trim()}`;
+      return (PV_CONFIG.STATION_QUERY || "Estação").trim();
+    }
+
+    function normalizeAgencyName(name){
+      return String(name || "").trim().toUpperCase().replace(/\s+/g, " ");
+    }
+    function agencyColor(agencyName){
+      const n = normalizeAgencyName(agencyName);
+      return PV_CONFIG.AGENCY_COLOR_MAP[n] || null;
+    }
+
     function toRad(deg){ return deg * Math.PI / 180; }
     function toDeg(rad){ return rad * 180 / Math.PI; }
 
@@ -1029,7 +1154,6 @@
       return points;
     }
 
-    // parsing directions
     function toMillis(v){
       if (!v) return null;
       if (v instanceof Date) return v.getTime();
@@ -1039,15 +1163,6 @@
       }
       if (typeof v === "object" && v.value) return toMillis(v.value);
       return null;
-    }
-
-    function normalizeAgencyName(name){
-      return String(name || "").trim().toUpperCase().replace(/\s+/g, " ");
-    }
-
-    function agencyColor(agencyName){
-      const n = normalizeAgencyName(agencyName);
-      return PV_CONFIG.AGENCY_COLOR_MAP[n] || null;
     }
 
     function extractTripsFromDirectionsResult(result){
@@ -1066,23 +1181,18 @@
           const lineShort = td.line?.short_name || td.line?.name || "—";
           const headsign = td.headsign || td.line?.name || td.arrival_stop?.name || "Destino";
 
-          // saída/chegada
           const depMs = toMillis(td.departure_time) || toMillis(td.departure_time?.value);
           const arrMs = toMillis(td.arrival_time) || toMillis(td.arrival_time?.value);
 
-          // ✅ para “horários de saída”, prioriza departure_time
+          // ✅ somente “saída”
           const timeMs = depMs || arrMs;
           if (!timeMs) continue;
 
-          // empresa / agência
           const agency =
             td.line?.agencies?.[0]?.name ||
-            td.line?.agencies?.[0]?.phone ||
-            td.line?.agencies?.[0]?.url ||
             td.line?.name ||
             "";
 
-          // cor se existir
           const color =
             td.line?.color ||
             agencyColor(agency) ||
@@ -1102,7 +1212,6 @@
     }
 
     function aggregateTrips(allTrips){
-      // dedup
       const uniqMap = new Map();
       for (const t of allTrips) uniqMap.set(t.key, t);
       const uniq = Array.from(uniqMap.values());
@@ -1147,7 +1256,6 @@
       return cards;
     }
 
-    // Directions varredura
     let directionsService = null;
     let refreshTimer = null;
     let stationLatLng = null;
@@ -1217,8 +1325,8 @@
 
     (async function boot(){
       try{
-        stationTitleEl.textContent = (PV_CONFIG.STATION_TITLE || "Estação").trim() || "Estação";
         panelInfoEl.textContent = `Próximas saídas (${PV_CONFIG.TIME_WINDOW_HOURS}h) • Next Bus`;
+        footerTextEl.textContent = PV_CONFIG.STATION_QUERY;
 
         if (PV_CONFIG.DEMO_MODE){
           warnEl.style.display = "none";
@@ -1235,9 +1343,11 @@
         const loc = geo.geometry.location;
         stationLatLng = { lat: loc.lat(), lng: loc.lng() };
 
-        // se o usuário deixou título em branco, usa o do Google
-        if (!String(PV_CONFIG.STATION_TITLE || "").trim()){
-          stationTitleEl.textContent = (geo.formatted_address || "Estação").split(",")[0].toUpperCase();
+        // ✅ título: prioridade URL (?title), senão monta via Geocoder
+        if (PV_CONFIG.STATION_TITLE){
+          stationTitleEl.textContent = PV_CONFIG.STATION_TITLE.toUpperCase();
+        } else {
+          stationTitleEl.textContent = buildTitleFromGeocode(geo).toUpperCase();
         }
 
         warnEl.style.display = "none";
@@ -1249,11 +1359,15 @@
       }catch(err){
         console.warn(err);
         warnEl.style.display = "block";
-        warnEl.textContent = "ERRO AO INICIAR. VERIFIQUE INTERNET, API KEY E O ENDEREÇO (STATION_QUERY).";
+        warnEl.textContent = "ERRO AO INICIAR. VERIFIQUE INTERNET, API KEY E O ENDEREÇO (station).";
+
+        // fallback do título: tenta "Centro, São Mateus"
+        const q = (PV_CONFIG.STATION_QUERY || "").split(",");
+        stationTitleEl.textContent = (q.length >= 2 ? `${q[0].trim()}, ${q[1].trim()}` : (PV_CONFIG.STATION_QUERY || "Estação")).toUpperCase();
+
         setStatus("Aguardando configuração…");
       }
     })();
   </script>
 </body>
 </html>
-
