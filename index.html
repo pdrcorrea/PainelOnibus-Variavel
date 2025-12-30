@@ -509,7 +509,7 @@
      *  - ?station=Centro,%20São%20Mateus%20-%20ES,%2029930-500
      *  - ?station=Rua%20X%20n%2010,%20Colatina%20-%20ES&window=2
      *******************************************************************/
-    const DEFAULT_STATION_FALLBACK = "Centro, São Mateus";
+    const DEFAULT_STATION_FALLBACK = "PONTO DE PARTIDA";
 
     function getQuery(){
       const q = new URLSearchParams(location.search);
@@ -530,7 +530,7 @@
     const PV_CONFIG = {
       DEMO_MODE: Q.demo,
 
-      STATION_QUERY: Q.station || "Centro, São Mateus - ES, 29930-500",
+      STATION_QUERY: Q.station || "Terminal Rodoviária de Vitória Carlos Alberto V. Campos",
       TIME_WINDOW_HOURS: Q.windowH || 2,
 
       SWEEP_POINTS: Q.sweep || 12,
@@ -1233,3 +1233,4 @@
   </script>
 </body>
 </html>
+
