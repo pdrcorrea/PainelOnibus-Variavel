@@ -3,12 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PontoView • Horários de Saída</title>
+  <title>PontoView • Ônibus</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;600;800;900&display=swap" rel="stylesheet"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     :root{
+      /* ====== MESMO ESTILO DO 1º CÓDIGO (PontoView) ====== */
       --ink:#0e1b2a;
 
       --topA:#0b2a44;
@@ -21,6 +24,7 @@
       --panel:#f1f3f6;
       --card:#ffffff;
       --line:#e7eef7;
+      --muted:#5b6b82;
 
       --radius: clamp(24px, 2.2vw, 36px);
       --radiusCard: clamp(18px, 1.8vw, 28px);
@@ -34,6 +38,11 @@
 
       --pillDark:#3a4656;
       --pillDark2:#2f3845;
+
+      /* ====== ÔNIBUS (mantém sua lógica) ====== */
+      --stageGap: 12px;
+      --ok:#1fa765;
+      --okSoft: rgba(31, 167, 101, .12);
     }
 
     *{box-sizing:border-box}
@@ -47,16 +56,18 @@
       overflow:hidden;
     }
 
-    .pvCard{
-      width:100vw;
-      height:100vh;
+    /* ====== Estrutura base (self-contained) ====== */
+    .pvPage{ width:100vw; height:100vh; background:#fff; }
+    .pvShell{
+      width:100%;
+      height:100%;
       display:flex;
       flex-direction:column;
       min-height:0;
       background:#fff;
     }
 
-    /* ================= HEADER (igual lógica) ================= */
+    /* ====== HEADER (igual ao 1º código) ====== */
     .pvHeader{
       position:relative;
       background: linear-gradient(180deg, var(--topB) 0%, var(--topC) 42%, var(--topA) 100%);
@@ -81,8 +92,9 @@
         linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,0) 42%);
       opacity:.95;
     }
-    .pvLeft, .pvRight{position:relative; z-index:1;}
-    .pvLeft{
+
+    .pvHeaderLeft, .pvHeaderRight{ position:relative; z-index:1; }
+    .pvHeaderLeft{
       display:flex;
       align-items:center;
       gap: clamp(12px, 1.5vw, 18px);
@@ -90,8 +102,7 @@
       flex:1 1 auto;
     }
 
-    /* badge glass (4 cantos arredondados, estilo PontoView) */
-    .pvBadge{
+    .pvIconBadge{
       width: clamp(44px, 4.2vw, 64px);
       height: clamp(44px, 4.2vw, 64px);
       border-radius: 18px;
@@ -104,10 +115,11 @@
       display:grid;
       place-items:center;
       flex:0 0 auto;
+      color:#fff;
     }
-    .pvBadge svg{width:62%; height:62%; opacity:.98}
+    .pvIconBadge svg{ width:62%; height:62%; opacity:.98; }
 
-    .pvTitles{display:flex; flex-direction:column; gap:6px; min-width:0;}
+    .pvTitles{ display:flex; flex-direction:column; gap:6px; min-width:0; }
     .pvTitle{
       margin:0;
       font-size: clamp(18px, 2.1vw, 34px);
@@ -126,13 +138,13 @@
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
 
-    .pvRight{
+    .pvHeaderRight{
       display:flex;
       align-items:center;
       justify-content:flex-end;
       min-width:max-content;
     }
-    .clockPill{
+    .pvClock{
       user-select:none;
       font-size: clamp(12px, 1.1vw, 16px);
       font-weight: 900;
@@ -150,155 +162,67 @@
       white-space:nowrap;
     }
 
-    /* ================= MAIN ================= */
-    .pvMain{
+    /* ====== SUBBAR (mantém estrutura para o script; visual mais limpo) ====== */
+    .pvSubbar{
+      flex:0 0 auto;
+      padding: 10px var(--pad);
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(231,238,247,.9);
+    }
+    .pvSubLeft{
+      min-width:0;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:#3b4b62;
+      opacity:.95;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .pvSubRight{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      min-width:max-content;
+    }
+    .pvPageLabel{
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:#3b4b62;
+      opacity:.95;
+      white-space:nowrap;
+    }
+    /* mantém a barra antiga, mas escondida (vamos usar a barra “colada na linha degradê”) */
+    .pvBar{ display:none; }
+
+    /* ====== CONTENT / SHELL ====== */
+    .pvContent{
       flex:1 1 auto;
       min-height:0;
       padding: var(--pad);
       background:#fff;
       overflow:hidden;
     }
-
-    .shell{
+    .pvCard{
       height:100%;
       border-radius: var(--radius);
       background: var(--panel);
       padding: clamp(12px, 1.4vw, 18px);
-      display:flex;
-      flex-direction:column;
-      gap: clamp(10px, 1.2vw, 16px);
+      border: none;
+      box-shadow: none;
       min-height:0;
       overflow:hidden;
     }
 
-    /* Lista de cards (sem interação; sem rolagem visível) */
-    .list{
-      flex:1 1 auto;
-      min-height:0;
-      display:flex;
-      flex-direction:column;
-      gap: clamp(10px, 1.2vw, 14px);
-      overflow:hidden;
-    }
-
-    .rowCard{
-      background: rgba(255,255,255,.88);
-      border: 1px solid rgba(231,238,247,.95);
-      border-radius: var(--radiusCard);
-      padding: clamp(12px, 1.3vw, 16px);
-      display:grid;
-      grid-template-columns: 10px 1fr auto;
-      align-items:center;
-      gap: clamp(12px, 1.4vw, 18px);
-      min-width:0;
-      box-shadow: 0 10px 22px rgba(2,10,23,.06);
-      backdrop-filter: blur(6px);
-      position:relative;
-      overflow:hidden;
-    }
-
-    /* faixa de cor da linha */
-    .stripe{
-      width:10px; height:100%;
-      border-radius: 999px;
-      background: #2c6aa3;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.35);
-    }
-
-    .mid{
-      min-width:0;
-      display:flex;
-      flex-direction:column;
-      gap: 8px;
-    }
-    .topLine{
-      display:flex;
-      align-items:baseline;
-      gap: 10px;
-      min-width:0;
-      flex-wrap:wrap;
-    }
-    .routeNo{
-      font-size: clamp(22px, 2.4vw, 40px);
-      font-weight: 900;
-      letter-spacing:-0.02em;
-      line-height:1;
-      color:#0e1b2a;
-      white-space:nowrap;
-    }
-    .routeName{
-      font-size: clamp(12px, 1.1vw, 16px);
-      font-weight: 900;
-      letter-spacing:.10em;
-      text-transform: uppercase;
-      color:#2a3a50;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      min-width:0;
-      max-width: 100%;
-      opacity:.92;
-    }
-
-    .metaLine{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      min-width:0;
-      flex-wrap:wrap;
-    }
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding: 10px 12px;
-      border-radius:999px;
-      background: #fff;
-      border:1px solid rgba(231,233,238,.95);
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing:.08em;
-      text-transform: uppercase;
-      color:#23344a;
-      white-space:nowrap;
-      box-shadow: 0 8px 18px rgba(0,0,0,.04);
-    }
-    .dot{
-      width:10px;height:10px;border-radius:999px;
-      background: currentColor;
-      opacity:.85;
-      box-shadow: 0 0 0 3px rgba(15,61,99,.10);
-    }
-
-    /* horário (lado direito) */
-    .timeBox{
-      display:flex;
-      flex-direction:column;
-      align-items:flex-end;
-      gap: 8px;
-      min-width:max-content;
-    }
-    .timeBig{
-      font-size: clamp(26px, 2.6vw, 46px);
-      font-weight: 900;
-      letter-spacing:.02em;
-      line-height:1;
-      font-variant-numeric: tabular-nums;
-      color:#0e1b2a;
-      white-space:nowrap;
-    }
-    .timeSub{
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing:.12em;
-      text-transform: uppercase;
-      color:#3b4b62;
-      opacity:.92;
-      white-space:nowrap;
-    }
-
-    /* ================= PROGRESS + FOOTER ================= */
-    /* barra de progresso colada na “linha em degradê” (acima do rodapé) */
+    /* ====== Barra degradê + progresso (igual ao 1º) ====== */
     .progressWrap{
       flex:0 0 auto;
       padding: 0 var(--pad);
@@ -311,15 +235,17 @@
       position:relative;
       overflow:hidden;
     }
-    .bar{
+    #barFill{
       position:absolute;
       inset:0;
       width: 0%;
       background: linear-gradient(90deg, rgba(255,255,255,.10), rgba(255,255,255,.18));
       mix-blend-mode: screen;
       transform-origin:left center;
+      border-radius: 999px;
     }
 
+    /* ====== FOOTER (igual ao 1º) ====== */
     .pvFooter{
       flex:0 0 auto;
       height: var(--footerH);
@@ -343,343 +269,956 @@
       text-overflow:ellipsis;
       min-width: 0;
     }
-
-    /* badges da empresa NO RODAPÉ (cinza escuro) */
-    .brands{
+    .pvFooterRight{
       display:flex;
+      align-items:center;
+      justify-content:flex-end;
       gap: 10px;
-      align-items:center;
-      justify-content:center;
-      min-width:0;
-      flex: 1 1 auto;
-      overflow:hidden;
-    }
-    .brandPill{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, var(--pillDark) 0%, var(--pillDark2) 100%);
-      border: 1px solid rgba(255,255,255,.12);
-      color:#fff;
-      font-weight: 900;
-      letter-spacing:.10em;
-      text-transform: uppercase;
-      font-size: 11px;
-      white-space:nowrap;
-      box-shadow: 0 10px 18px rgba(0,0,0,.14);
-      max-width: 100%;
-    }
-    .brandDot{
-      width:10px;height:10px;border-radius:999px;
-      background: var(--c, #2c6aa3);
-      box-shadow: 0 0 0 3px rgba(255,255,255,.10);
       flex:0 0 auto;
     }
-    .brandTxt{
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width: 20vw;
-    }
-
     .pvLogo{
       height: clamp(16px, 2.3vh, 22px);
       width:auto;
       display:block;
       opacity:.92;
+    }
+
+    /* ====== ÔNIBUS: conteúdo (cards/paginação) com estética do 1º ====== */
+    .busWrap{
+      height:100%;
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+      gap: 12px;
+    }
+
+    .warn{
+      display:none;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #fff7ed;
+      border: 1px dashed #fdba74;
+      color: #7c2d12;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+    }
+
+    .stage{
+      position:relative;
+      flex: 1;
+      min-height:0;
+      overflow:hidden;
+      background: transparent;
+    }
+
+    .page{
+      position:absolute;
+      inset: 0;
+      display:grid;
+      gap: var(--stageGap);
+      align-content:start;
+      opacity:0;
+      transform: translateX(18px);
+      pointer-events:none;
+    }
+    .page.active{
+      opacity:1;
+      transform: translateX(0);
+      pointer-events:auto;
+      transition: opacity var(--anim) var(--ease), transform var(--anim) var(--ease);
+    }
+    .page.exit{
+      opacity:0;
+      transform: translateX(-18px);
+      transition: opacity var(--anim) var(--ease), transform var(--anim) var(--ease);
+    }
+
+    .card{
+      background: rgba(255,255,255,.88);
+      border: 1px solid rgba(231,238,247,.95);
+      border-radius: var(--radiusCard);
+      padding: clamp(12px, 1.3vw, 16px);
+      display:grid;
+      grid-template-columns: 140px 1fr 260px;
+      align-items:center;
+      gap: clamp(12px, 1.4vw, 18px);
+      min-width:0;
+      box-shadow: 0 10px 22px rgba(2,10,23,.06);
+      backdrop-filter: blur(6px);
+      position:relative;
+      overflow:hidden;
+      min-height: 92px;
+    }
+
+    .stripe{
+      position:absolute;
+      inset:0 auto 0 0;
+      width: 10px;
+      border-radius: 999px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.35);
+    }
+
+    .lineCol{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      align-items:flex-start;
+      padding-left: 10px;
+      min-width:0;
+    }
+    .lineNum{
+      font-size: clamp(28px, 2.6vw, 40px);
+      font-weight: 900;
+      letter-spacing: .02em;
+      line-height: 1;
+      color: #0e1b2a;
+    }
+
+    /* empresa no “pill” (estilo do 1º) */
+    .company{
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius:999px;
+      background: #fff;
+      border:1px solid rgba(231,233,238,.95);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing:.10em;
+      text-transform: uppercase;
+      color:#23344a;
+      white-space:nowrap;
+      box-shadow: 0 8px 18px rgba(0,0,0,.04);
+      max-width: 220px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background: currentColor;
+      opacity:.85;
+      box-shadow: 0 0 0 3px rgba(15,61,99,.10);
       flex:0 0 auto;
     }
+    .company span:last-child{
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      min-width:0;
+    }
 
-    /* ================= RESPONSIVO (mesma lógica) ================= */
+    .destCol{
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+    }
+    .destName{
+      font-size: clamp(18px, 2.0vw, 32px);
+      font-weight: 900;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+      color: #0e1b2a;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .timesCol{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .timeRow{
+      width: 100%;
+      max-width: 260px;
+      display:flex;
+      align-items: stretch;
+      gap: 10px;
+    }
+
+    .next{
+      flex: 1 1 auto;
+      text-align:center;
+      padding: 10px 12px;
+      border-radius: 18px;
+      background: rgba(31, 167, 101, .08);
+      border: 1px solid rgba(31, 167, 101, .18);
+      display:flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      box-shadow: 0 8px 18px rgba(0,0,0,.04);
+    }
+    .next .when{
+      font-size: clamp(24px, 2.3vw, 38px);
+      font-weight: 900;
+      letter-spacing: .06em;
+      color: rgba(31, 167, 101, .92);
+      line-height: 1.05;
+      font-variant-numeric: tabular-nums;
+    }
+    .next .label{
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: rgba(31, 167, 101, .72);
+    }
+
+    .nextSide{
+      flex: 0 0 auto;
+      width: 120px;
+      border-radius: 18px;
+      border: 1px solid rgba(231,233,238,.95);
+      background: #fff;
+      padding: 10px 10px;
+      display:flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 8px 18px rgba(0,0,0,.04);
+    }
+    .nextSideItem{
+      width: 100%;
+      text-align:center;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .10em;
+      padding: 6px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(231,233,238,.95);
+      background: #f1f5f9;
+      color: #0e1b2a;
+      white-space: nowrap;
+      opacity: .92;
+    }
+
+    .empty{
+      padding: 22px 18px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.88);
+      border: 1px solid rgba(231,238,247,.95);
+      color: #3b4b62;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      text-align:center;
+      box-shadow: 0 10px 22px rgba(2,10,23,.06);
+      backdrop-filter: blur(6px);
+    }
+
+    /* ====== Responsivo (sem quebrar) ====== */
+    @media (max-width: 980px){
+      .card{
+        min-height: 74px;
+        padding: 12px 14px;
+        gap: 12px;
+        grid-template-columns: 110px 1fr 220px;
+        border-radius: 16px;
+      }
+      .lineNum{ font-size: 30px; }
+      .company{ max-width: 190px; font-size: 10px; padding: 9px 10px; }
+      .dot{ width: 9px; height: 9px; }
+      .destName{ font-size: 22px; }
+
+      .timeRow{ max-width: 220px; gap: 9px; }
+      .next{ padding: 9px 10px; border-radius: 16px; }
+      .next .when{ font-size: 28px; }
+      .next .label{ font-size: 10px; margin-top: 5px; }
+      .nextSide{ width: 105px; padding: 9px 9px; border-radius: 16px; }
+      .nextSideItem{ font-size: 10px; padding: 6px 7px; }
+    }
+
+    @media (max-width: 640px){
+      .card{ grid-template-columns: 96px 1fr 190px; }
+      .destName{ font-size: 18px; }
+      .timeRow{ max-width: 190px; gap: 8px; }
+      .nextSide{ width: 92px; }
+      .nextSideItem{ font-size: 10px; padding: 5px 6px; }
+    }
+
     @media (orientation: portrait){
-      /* mantém layout, só compacta pra caber sem sobrepor */
-      .shell{ padding: clamp(10px, 1.2vw, 14px); }
-      .rowCard{ padding: 12px; grid-template-columns: 10px 1fr auto; }
-      .routeNo{ font-size: clamp(20px, 4.4vw, 38px); }
-      .timeBig{ font-size: clamp(24px, 5.2vw, 44px); }
-      .pill{ padding: 9px 11px; font-size: 11px; }
-      .brandTxt{ max-width: 24vw; }
-    }
-
-    @media (max-width: 720px){
-      .brands{ justify-content:flex-start; }
-      .brandTxt{ max-width: 28vw; }
-    }
-
-    @media (max-height: 620px){
-      /* reduz “detalhes” para caber em telas baixas */
-      .pill{ padding: 8px 10px; }
-      .metaLine{ gap:8px; }
-      .rowCard{ padding: 10px; }
+      .pvCard{ padding: clamp(10px, 1.2vw, 14px); }
+      .card{ grid-template-columns: 120px 1fr 240px; }
     }
   </style>
 </head>
 
 <body>
-  <div class="pvCard" id="panel" data-title="HORÁRIOS DE SAÍDA" data-subtitle="LOCALIZAÇÃO">
-    <header class="pvHeader">
-      <div class="pvLeft">
-        <div class="pvBadge" aria-hidden="true" id="hdrIcon"></div>
-        <div class="pvTitles">
-          <h1 class="pvTitle" id="title"></h1>
-          <div class="pvSubtitle" id="subtitle"></div>
+  <div class="pvPage">
+    <div class="pvShell" id="pvPanel"
+      data-title="HORÁRIOS DE SAÍDA"
+      data-subtitle="ESTAÇÃO"
+      data-subleft="Próximas saídas (2h) • Next Bus">
+
+      <!-- HEADER -->
+      <header class="pvHeader">
+        <div class="pvHeaderLeft">
+          <div class="pvIconBadge" aria-hidden="true" id="pvBadge">
+            <!-- Ícone ÔNIBUS -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 6h8a4 4 0 0 1 4 4v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7a4 4 0 0 1 4-4Z"/>
+              <path d="M6 16h12"/>
+              <path d="M7 19l-1 2"/>
+              <path d="M18 19l1 2"/>
+              <path d="M7.5 13h.01"/>
+              <path d="M16.5 13h.01"/>
+            </svg>
+          </div>
+
+          <div class="pvTitles">
+            <h1 class="pvTitle" id="pvTitle"></h1>
+            <div class="pvSubtitle" id="pvSubtitle"></div>
+          </div>
+        </div>
+
+        <div class="pvHeaderRight">
+          <div class="pvClock" id="pvClock">--:--</div>
+        </div>
+      </header>
+
+      <!-- SUBBAR (mantida para o script; visual mais clean) -->
+      <div class="pvSubbar">
+        <div class="pvSubLeft" id="pvSubLeft"></div>
+        <div class="pvSubRight">
+          <span class="pvPageLabel" id="pageLabel">PÁGINA 1/1</span>
+          <div class="pvBar" aria-hidden="true"><div></div></div>
         </div>
       </div>
 
-      <div class="pvRight">
-        <div class="clockPill" id="clock">HH:MM</div>
+      <!-- CONTENT -->
+      <main class="pvContent">
+        <section class="pvCard">
+          <div class="busWrap">
+            <div class="warn" id="warn"></div>
+            <div class="stage" id="stage"></div>
+          </div>
+        </section>
+      </main>
+
+      <!-- barra “colada” na linha degradê (usa o MESMO id barFill do seu script) -->
+      <div class="progressWrap" aria-hidden="true">
+        <div class="divider"><div id="barFill"></div></div>
       </div>
-    </header>
 
-    <!-- (sub barra eliminada, como pediu) -->
-
-    <main class="pvMain">
-      <div class="shell">
-        <div class="list" id="list"></div>
-      </div>
-    </main>
-
-    <!-- barra de progresso colada na “linha degradê”, acima do rodapé -->
-    <div class="progressWrap" aria-hidden="true">
-      <div class="divider"><div class="bar" id="bar"></div></div>
+      <!-- FOOTER -->
+      <footer class="pvFooter">
+        <div class="pvFooterLeft" id="pvFooterUpdate">ÚLTIMA ATUALIZAÇÃO • —</div>
+        <div class="pvFooterRight">
+          <img class="pvLogo" src="./assets/logo-pontoview.png" alt="PontoView" />
+        </div>
+      </footer>
     </div>
-
-    <footer class="pvFooter" aria-label="Rodapé PontoView">
-      <div class="pvFooterLeft" id="updated">ATUALIZADO • —</div>
-
-      <!-- badges das empresas (antes estavam dentro dos cards; agora ficam aqui) -->
-      <div class="brands" id="brands"></div>
-
-      <img class="pvLogo" src="./assets/logo-pontoview.png" alt="Logo PontoView" />
-    </footer>
   </div>
 
+  <script src="config.js"></script>
+
+  <!-- SEU SCRIPT ORIGINAL (comportamento preservado) -->
   <script>
-    /* ========= Ícone do cabeçalho (cloud-like/horário) ========= */
-    function svgDepart(){
-      return `
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 17.5a4.5 4.5 0 0 0-1.3-8.8A6 6 0 0 0 6.2 10.2 3.8 3.8 0 0 0 7 17.5h13z"/>
-        <path d="M12 12v4"/>
-        <path d="M12 12h3"/>
-      </svg>`;
-    }
+    /*******************************************************************
+     * INIT PADRÃO (título/subbar/relógio)
+     *******************************************************************/
+    const panel = document.getElementById("pvPanel");
+    const titleEl = document.getElementById("pvTitle");
+    const subtitleEl = document.getElementById("pvSubtitle");
+    const subLeftEl = document.getElementById("pvSubLeft");
+    const footerUpdateEl = document.getElementById("pvFooterUpdate");
 
-    /* ========= DEMO DATA (substitua pela sua fonte real) =========
-       Mantém cards com: cores, números, linhas, horários etc.
-       -> Importante: NÃO tem "badge de empresa" dentro do card (como você pediu).
-    */
-    const rows = [
-      {
-        lineColor: "#2c6aa3",
-        routeNo: "01",
-        routeName: "CENTRO • BAIRRO",
-        pills: [
-          { label:"PLATAFORMA 2", color:"#0f3d63" },
-          { label:"PRÓXIMA", color:"#0f3d63" }
-        ],
-        time: "14:55",
-        sub: "SAÍDA"
-      },
-      {
-        lineColor: "#16a34a",
-        routeNo: "12",
-        routeName: "RODOVIÁRIA • UNIVERSIDADE",
-        pills: [
-          { label:"PLATAFORMA 1", color:"#14532d" },
-          { label:"EM 10 MIN", color:"#14532d" }
-        ],
-        time: "15:05",
-        sub: "SAÍDA"
-      },
-      {
-        lineColor: "#f59e0b",
-        routeNo: "07",
-        routeName: "SHOPPING • HOSPITAL",
-        pills: [
-          { label:"PLATAFORMA 3", color:"#7c4a00" },
-          { label:"EMBARQUE", color:"#7c4a00" }
-        ],
-        time: "15:20",
-        sub: "SAÍDA"
-      },
-      {
-        lineColor: "#ef4444",
-        routeNo: "05",
-        routeName: "AEROPORTO • CENTRO",
-        pills: [
-          { label:"PLATAFORMA 4", color:"#7f1d1d" },
-          { label:"ATRASO", color:"#7f1d1d" }
-        ],
-        time: "15:35",
-        sub: "PREVISTO"
-      },
-      {
-        lineColor: "#7c3aed",
-        routeNo: "22",
-        routeName: "PRAIA • TERMINAL",
-        pills: [
-          { label:"PLATAFORMA 2", color:"#3b1b7a" },
-          { label:"EM 30 MIN", color:"#3b1b7a" }
-        ],
-        time: "15:50",
-        sub: "SAÍDA"
-      }
-    ];
+    titleEl.textContent = panel.dataset.title || "";
+    subtitleEl.textContent = (panel.dataset.subtitle || "").toUpperCase();
+    subLeftEl.textContent = panel.dataset.subleft || "";
 
-    /* ========= Empresas (badges no rodapé) ========= */
-    const companies = [
-      { name: "Viação Alfa", color: "#2c6aa3" },
-      { name: "Expresso Beta", color: "#16a34a" },
-      { name: "Trans Gama", color: "#f59e0b" }
-    ];
-
-    /* ========= Render ========= */
-    const list = document.getElementById("list");
-    const brands = document.getElementById("brands");
-
-    function renderRows(maxRows){
-      list.innerHTML = "";
-      rows.slice(0, maxRows).forEach(r=>{
-        const el = document.createElement("div");
-        el.className = "rowCard";
-        el.innerHTML = `
-          <div class="stripe" style="background:${r.lineColor}"></div>
-
-          <div class="mid">
-            <div class="topLine">
-              <div class="routeNo">${r.routeNo}</div>
-              <div class="routeName">${r.routeName}</div>
-            </div>
-            <div class="metaLine">
-              ${r.pills.map(p=>`
-                <span class="pill" style="color:${p.color}">
-                  <span class="dot"></span>${p.label}
-                </span>
-              `).join("")}
-            </div>
-          </div>
-
-          <div class="timeBox">
-            <div class="timeBig">${r.time}</div>
-            <div class="timeSub">${r.sub}</div>
-          </div>
-        `;
-        list.appendChild(el);
-      });
-    }
-
-    function renderCompanies(){
-      brands.innerHTML = "";
-      companies.forEach(c=>{
-        const pill = document.createElement("div");
-        pill.className = "brandPill";
-        pill.style.setProperty("--c", c.color);
-        pill.innerHTML = `<span class="brandDot"></span><span class="brandTxt">${c.name}</span>`;
-        brands.appendChild(pill);
-      });
-    }
-
-    /* ========= Responsivo sem rolagem: ajusta quantidade de cards ========= */
-    function computeMaxRows(){
-      const h = window.innerHeight;
-      const portrait = window.matchMedia && window.matchMedia("(orientation: portrait)").matches;
-
-      // valores conservadores pra nunca estourar e não sobrepor
-      if (portrait){
-        if (h < 720) return 4;
-        return 5;
-      }
-      if (h < 620) return 4;
-      return 5;
-    }
-
-    /* ========= Clock + Updated ========= */
     function pad2(n){ return String(n).padStart(2,"0"); }
     function hhmm(d=new Date()){ return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`; }
-    function ddmm_hhmm(d=new Date()){
-      return `${pad2(d.getDate())}/${pad2(d.getMonth()+1)}, ${hhmm(d)}`;
+
+    function tickClock(){ document.getElementById("pvClock").textContent = hhmm(); }
+    tickClock();
+    const msToNextSecond = 1000 - new Date().getMilliseconds();
+    setTimeout(() => { tickClock(); setInterval(tickClock, 1000); }, msToNextSecond);
+
+    function setUpdatedNow(){ footerUpdateEl.textContent = `ÚLTIMA ATUALIZAÇÃO • ${hhmm()}`; }
+
+    /*******************************************************************
+     * PAINEL DE CONFIGURAÇÃO POR URL
+     *******************************************************************/
+    const DEFAULT_STATION_FALLBACK = "Centro da Cidade";
+
+    function getQuery(){
+      const q = new URLSearchParams(location.search);
+      const station = (q.get("station") || "").trim();
+      const demo = (q.get("demo") || "").trim();
+      return {
+        station: station || null,
+        demo: demo === "1" || demo.toLowerCase() === "true" || demo.toLowerCase() === "demo"
+      };
+    }
+    const Q = getQuery();
+
+    const PV_CONFIG = {
+      DEMO_MODE: Q.demo,
+      STATION_QUERY: Q.station || "Av. Ângelo Giuberti, 291 - Esplanada, Colatina - ES, 29702-060",
+
+      TIME_WINDOW_HOURS: 2,
+      SWEEP_POINTS: 12,
+      SWEEP_RADIUS_M: 1200,
+      REFRESH_EVERY_MS: 30 * 60 * 1000,
+      PAST_TOLERANCE_MS: 20_000,
+      CLUSTER_GAP_MIN: 2,
+
+      DEMO_LINES_COUNT: 18,
+      DEMO_REFRESH_SEC: 25,
+      DEMO_HEADSIGN_POOL: ["COHAB","AROEIRA","SANTA TEREZA","CENTRO","BAIRRO INDUSTRIAL","RIVIERA","AYRTON SENNA"],
+      DEMO_AGENCIES: [
+        { name:"VIAÇÃO SÃO GABRIEL", color:"#f3c316" },
+        { name:"VIAÇÃO JOANA DARC", color:"#0f3f82" },
+        { name:"VIAÇÃO SÃO ROQUE", color:"#5fc2ff" },
+        { name:"TRANS COLATINA", color:"#ff7a00" }
+      ]
+    };
+
+    const GOOGLE_MAPS_API_KEY = (window.PONTOVIEW_GMAPS_KEY || "").trim() || "COLE_SUA_API_KEY_AQUI";
+
+    const warnEl = document.getElementById("warn");
+    const stageEl = document.getElementById("stage");
+    const pageLabelEl = document.getElementById("pageLabel");
+    const barFillEl = document.getElementById("barFill");
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, (m) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+    function fmtHHMM(ms){
+      if (!Number.isFinite(ms)) return "--:--";
+      const d = new Date(ms);
+      return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+    }
+    function diffMin(aMs, bMs){ return Math.round(Math.abs(aMs - bMs) / 60000); }
+    function setStatus(text){ subLeftEl.textContent = text; }
+
+    function clusterTimes(timesMs){
+      const t = (timesMs || []).slice().sort((a,b)=>a-b);
+      if (!t.length) return [];
+      const clusters = [];
+      let cur = [t[0]];
+      for (let i=1;i<t.length;i++){
+        if (diffMin(t[i], t[i-1]) <= PV_CONFIG.CLUSTER_GAP_MIN) cur.push(t[i]);
+        else { clusters.push(cur); cur=[t[i]]; }
+      }
+      clusters.push(cur);
+      return clusters.map(c => c.length === 1 ? fmtHHMM(c[0]) : `${fmtHHMM(c[0])}–${fmtHHMM(c[c.length-1])}`);
     }
 
-    function tick(){
-      document.getElementById("clock").textContent = hhmm();
-      document.getElementById("updated").textContent = `ATUALIZADO • ${ddmm_hhmm()}`;
+    let currentCards = [];
+    let pages = [];
+    let pageIndex = 0;
+
+    let pageTimer = null;
+    let progressTimer = null;
+    let pageStart = 0;
+
+    const PAGE_DURATION_MS = 12000;
+    const PAGE_PROGRESS_TICK_MS = 120;
+
+    function clearTimers(){
+      if (pageTimer) clearTimeout(pageTimer);
+      if (progressTimer) clearInterval(progressTimer);
+      pageTimer = null;
+      progressTimer = null;
+    }
+    function setPagerLabel(){
+      const total = Math.max(1, pages.length);
+      pageLabelEl.textContent = `PÁGINA ${Math.min(pageIndex+1, total)}/${total}`;
+    }
+    function setProgress(p){
+      const pct = Math.max(0, Math.min(100, p));
+      barFillEl.style.width = pct + "%";
     }
 
-    /* ========= Barra de progresso (ciclo automático) ========= */
-    const CYCLE_MS = 16000; // ciclo visual (troca/atualização)
-    const bar = document.getElementById("bar");
-    let t0 = performance.now();
+    function buildCardEl(card){
+      const el = document.createElement("div");
+      el.className = "card";
 
-    function animateBar(now){
-      const p = ((now - t0) % CYCLE_MS) / CYCLE_MS;
-      bar.style.width = `${Math.max(2, p*100)}%`;
-      requestAnimationFrame(animateBar);
-    }
+      const stripeColor = (card.lineColor || "").trim() || "#0f3f82";
+      const dotColor = stripeColor;
 
-    /* ========= Boot ========= */
-    document.getElementById("hdrIcon").innerHTML = svgDepart();
-    document.getElementById("title").textContent = document.getElementById("panel").dataset.title || "HORÁRIOS DE SAÍDA";
-    document.getElementById("subtitle").textContent = document.getElementById("panel").dataset.subtitle || "LOCALIZAÇÃO";
+      const next = fmtHHMM(card.times[0]);
+      const rest = card.times.slice(1);
 
-    renderCompanies();
-    tick();
-    setInterval(tick, 1000);
+      const nextTimes = clusterTimes(rest);
+      const hasNext = nextTimes.length > 0;
 
-    function rerender(){
-      renderRows(computeMaxRows());
-    }
-    rerender();
-    window.addEventListener("resize", ()=> setTimeout(rerender, 120));
+      const MAX_NEXT = 3;
+      const show = nextTimes.slice(0, MAX_NEXT);
 
-    requestAnimationFrame(animateBar);
+      const nextSideHtml = hasNext
+        ? `<div class="nextSide" aria-label="Próximos horários">
+            ${show.map(t => `<div class="nextSideItem">${escapeHtml(t)}</div>`).join("")}
+           </div>`
+        : ``;
 
-    /* (Opcional) se você quiser “rotacionar” os cards automaticamente sem interação:
-       aqui só fica pronto, sem mexer no layout.
-    */
-    let page = 0;
-    setInterval(()=>{
-      const maxRows = computeMaxRows();
-      const totalPages = Math.max(1, Math.ceil(rows.length / maxRows));
-      page = (page + 1) % totalPages;
-      const sliceStart = page * maxRows;
-      const sliceEnd = sliceStart + maxRows;
+      const agencyLabel = (card.agency || "").trim() || "ÔNIBUS";
 
-      list.innerHTML = "";
-      rows.slice(sliceStart, sliceEnd).forEach(r=>{
-        const el = document.createElement("div");
-        el.className = "rowCard";
-        el.style.opacity = "0";
-        el.style.transform = "translateY(10px)";
-        el.style.transition = "opacity 520ms var(--ease), transform 520ms var(--ease)";
-        el.innerHTML = `
-          <div class="stripe" style="background:${r.lineColor}"></div>
-          <div class="mid">
-            <div class="topLine">
-              <div class="routeNo">${r.routeNo}</div>
-              <div class="routeName">${r.routeName}</div>
-            </div>
-            <div class="metaLine">
-              ${r.pills.map(p=>`
-                <span class="pill" style="color:${p.color}">
-                  <span class="dot"></span>${p.label}
-                </span>
-              `).join("")}
-            </div>
+      el.innerHTML = `
+        <div class="lineCol">
+          <div class="lineNum">${escapeHtml(card.line)}</div>
+          <div class="company" title="${escapeHtml(agencyLabel)}" style="color:${escapeHtml(dotColor)}">
+            <span class="dot" style="background:${escapeHtml(dotColor)}"></span>
+            <span style="color:#23344a">${escapeHtml(agencyLabel)}</span>
           </div>
-          <div class="timeBox">
-            <div class="timeBig">${r.time}</div>
-            <div class="timeSub">${r.sub}</div>
+        </div>
+
+        <div class="destCol">
+          <div class="destName">${escapeHtml(card.destination)}</div>
+        </div>
+
+        <div class="timesCol">
+          <div class="timeRow">
+            <div class="next">
+              <div class="when">${next}</div>
+              <div class="label">SAÍDA</div>
+            </div>
+            ${nextSideHtml}
           </div>
-        `;
-        list.appendChild(el);
-        requestAnimationFrame(()=>{ el.style.opacity="1"; el.style.transform="translateY(0)"; });
+        </div>
+      `;
+
+      const stripe = document.createElement("div");
+      stripe.className = "stripe";
+      stripe.style.background = stripeColor;
+      el.prepend(stripe);
+
+      return el;
+    }
+
+    async function computePerPage(cards){
+      stageEl.innerHTML = "";
+      const sample = buildCardEl(cards[0]);
+      stageEl.appendChild(sample);
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+      const available = Math.max(0, stageEl.clientHeight);
+      const cardH = sample.getBoundingClientRect().height || 90;
+      const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--stageGap")) || 12;
+
+      stageEl.innerHTML = "";
+
+      let perPage = Math.floor((available + gap) / (cardH + gap));
+      perPage = Math.max(1, Math.min(20, perPage));
+
+      if (perPage === 1 && available > (cardH * 2.2)) perPage = 2;
+      if (perPage === 2 && available > (cardH * 3.2)) perPage = 3;
+
+      return Math.max(2, perPage);
+    }
+
+    async function paginateCards(cards){
+      stageEl.innerHTML = "";
+      pages = [];
+      pageIndex = 0;
+
+      if (!cards.length){
+        const p = document.createElement("div");
+        p.className = "page active";
+        p.innerHTML = `<div class="empty">Nenhuma saída encontrada nas próximas ${PV_CONFIG.TIME_WINDOW_HOURS} horas.</div>`;
+        stageEl.appendChild(p);
+        pages = [p];
+        setPagerLabel();
+        setProgress(100);
+        return;
+      }
+
+      const perPage = await computePerPage(cards);
+
+      for (let i=0; i<cards.length; i += perPage){
+        const chunk = cards.slice(i, i+perPage);
+        const page = document.createElement("div");
+        page.className = "page";
+
+        for (const c of chunk) page.appendChild(buildCardEl(c));
+        stageEl.appendChild(page);
+        pages.push(page);
+      }
+
+      pages[0].classList.add("active");
+      setPagerLabel();
+      startPaging();
+    }
+
+    function showPage(nextIndex){
+      if (!pages.length) return;
+
+      const from = pages[pageIndex];
+      const to = pages[nextIndex];
+      if (from === to) return;
+
+      from.classList.remove("active");
+      from.classList.add("exit");
+
+      to.classList.remove("exit");
+      void to.offsetWidth;
+      to.classList.add("active");
+
+      setTimeout(() => from.classList.remove("exit"), 560);
+
+      pageIndex = nextIndex;
+      setPagerLabel();
+      setProgress(0);
+    }
+
+    function startPaging(){
+      clearTimers();
+      if (pages.length <= 1){ setProgress(100); return; }
+
+      pageStart = Date.now();
+      setProgress(0);
+
+      progressTimer = setInterval(() => {
+        const elapsed = Date.now() - pageStart;
+        setProgress((elapsed / PAGE_DURATION_MS) * 100);
+      }, PAGE_PROGRESS_TICK_MS);
+
+      pageTimer = setTimeout(() => {
+        const next = (pageIndex + 1) % pages.length;
+        showPage(next);
+        startPaging();
+      }, PAGE_DURATION_MS);
+    }
+
+    function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function pick(arr){ return arr[randInt(0, arr.length - 1)]; }
+
+    function buildDemoCards(){
+      const now = Date.now();
+      const end = now + PV_CONFIG.TIME_WINDOW_HOURS * 60 * 60 * 1000;
+
+      const lines = new Set();
+      while (lines.size < PV_CONFIG.DEMO_LINES_COUNT){
+        const base = Math.random() < 0.30 ? randInt(300, 499) : randInt(1, 199);
+        lines.add(String(base));
+      }
+
+      const cards = [];
+      for (const line of lines){
+        const dest = pick(PV_CONFIG.DEMO_HEADSIGN_POOL);
+        const agency = pick(PV_CONFIG.DEMO_AGENCIES);
+
+        const times = [];
+        let t = now + randInt(2, 18) * 60 * 1000;
+        while (t <= end){
+          times.push(t);
+          t += randInt(6, 36) * 60 * 1000;
+        }
+        times.sort((a,b)=>a-b);
+        if (Math.random() < 0.20) times.splice(1);
+
+        cards.push({
+          line,
+          destination: dest,
+          times,
+          nextTime: times[0],
+          agency: agency.name,
+          lineColor: agency.color
+        });
+      }
+
+      cards.sort((a,b)=>a.nextTime - b.nextTime);
+      return cards;
+    }
+
+    let demoTimer = null;
+    async function startDemoLoop(){
+      subtitleEl.textContent = String(PV_CONFIG.STATION_QUERY || DEFAULT_STATION_FALLBACK).toUpperCase();
+      setStatus(`Próximas saídas (${PV_CONFIG.TIME_WINDOW_HOURS}h) • Modo demo`);
+      warnEl.style.display = "none";
+
+      const render = async () => {
+        currentCards = buildDemoCards();
+        await paginateCards(currentCards);
+        setUpdatedNow();
+      };
+
+      await render();
+      if (demoTimer) clearInterval(demoTimer);
+      demoTimer = setInterval(render, PV_CONFIG.DEMO_REFRESH_SEC * 1000);
+    }
+
+    function loadGoogleMaps(){
+      return new Promise((resolve, reject) => {
+        if (window.google?.maps) return resolve();
+
+        const key = (GOOGLE_MAPS_API_KEY || "").trim();
+        if (!key || key === "COLE_SUA_API_KEY_AQUI"){
+          warnEl.style.display = "block";
+          warnEl.textContent = "INSIRA SUA GOOGLE MAPS API KEY (config.js OU CONSTANTE GOOGLE_MAPS_API_KEY).";
+          return reject(new Error("Missing API key"));
+        }
+
+        const script = document.createElement("script");
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}`;
+        script.async = true;
+        script.defer = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error("Falha ao carregar Google Maps JS API"));
+        document.head.appendChild(script);
       });
+    }
 
-      // reinicia a barra visual junto do “page”
-      t0 = performance.now();
-    }, CYCLE_MS);
+    function geocodeStation(query){
+      return new Promise((resolve, reject) => {
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ address: query }, (results, status) => {
+          if (status === "OK" && results && results[0]) resolve(results[0]);
+          else reject(new Error("Geocoding falhou: " + status));
+        });
+      });
+    }
+
+    function buildTitleFromGeocode(geo){
+      const ac = geo?.address_components || [];
+      const pickType = (type) => {
+        const found = ac.find(c => (c.types || []).includes(type));
+        return found ? (found.long_name || found.short_name || "") : "";
+      };
+
+      const neighborhood =
+        pickType("neighborhood") || pickType("sublocality_level_1") || pickType("sublocality") || "";
+
+      const city = pickType("locality") || pickType("administrative_area_level_2") || "";
+      const state = (ac.find(c => (c.types || []).includes("administrative_area_level_1"))?.short_name) || "";
+
+      if (!neighborhood && city) return `Centro, ${city}`;
+      if (neighborhood && city && state) return `${neighborhood}, ${city} - ${state}`;
+      if (neighborhood && city) return `${neighborhood}, ${city}`;
+      if (city && state) return `${city} - ${state}`;
+      if (city) return city;
+
+      return DEFAULT_STATION_FALLBACK;
+    }
+
+    function toRad(deg){ return deg * Math.PI / 180; }
+    function toDeg(rad){ return rad * 180 / Math.PI; }
+    function destinationPoint(lat, lng, bearingDeg, distanceM){
+      const R = 6371000;
+      const brng = toRad(bearingDeg);
+      const dDivR = distanceM / R;
+      const lat1 = toRad(lat);
+      const lon1 = toRad(lng);
+
+      const lat2 = Math.asin(
+        Math.sin(lat1)*Math.cos(dDivR) +
+        Math.cos(lat1)*Math.sin(dDivR)*Math.cos(brng)
+      );
+      const lon2 = lon1 + Math.atan2(
+        Math.sin(brng)*Math.sin(dDivR)*Math.cos(lat1),
+        Math.cos(dDivR) - Math.sin(lat1)*Math.sin(lat2)
+      );
+
+      return { lat: toDeg(lat2), lng: toDeg(lon2) };
+    }
+
+    function buildSweepDestinations(stationLatLng){
+      const points = [];
+      for (let i=0;i<PV_CONFIG.SWEEP_POINTS;i++){
+        const bearing = i * (360 / PV_CONFIG.SWEEP_POINTS);
+        points.push(destinationPoint(stationLatLng.lat, stationLatLng.lng, bearing, PV_CONFIG.SWEEP_RADIUS_M));
+      }
+      return points;
+    }
+
+    function toMillis(v){
+      if (!v) return null;
+      if (v instanceof Date) return v.getTime();
+      if (typeof v === "number"){
+        if (v > 1e12) return v;
+        if (v > 1e9)  return v*1000;
+      }
+      if (typeof v === "object" && v.value) return toMillis(v.value);
+      return null;
+    }
+
+    function extractTripsFromDirectionsResult(result){
+      const trips = [];
+      if (!result?.routes?.length) return trips;
+
+      for (const route of result.routes){
+        const leg = route.legs?.[0];
+        if (!leg?.steps?.length) continue;
+
+        for (const step of leg.steps){
+          if (step.travel_mode !== "TRANSIT" || !step.transit) continue;
+
+          const td = step.transit;
+          const lineShort = td.line?.short_name || td.line?.name || "—";
+          const headsign = td.headsign || td.line?.name || td.arrival_stop?.name || "Destino";
+
+          const depMs = toMillis(td.departure_time) || toMillis(td.departure_time?.value);
+          if (!depMs) continue;
+
+          const agencyName =
+            td.line?.agencies?.[0]?.name ||
+            td.line?.agencies?.[0]?.short_name ||
+            "";
+
+          const lineColor = (td.line?.color || "").trim();
+
+          trips.push({
+            line: String(lineShort),
+            destination: String(headsign),
+            timeMs: depMs,
+            agency: String(agencyName || "").trim(),
+            lineColor,
+            key: `${String(lineShort)}|${String(headsign)}|${depMs}|${String(agencyName||"")}|${String(lineColor||"")}`
+          });
+        }
+      }
+      return trips;
+    }
+
+    function aggregateTrips(allTrips){
+      const uniqMap = new Map();
+      for (const t of allTrips) uniqMap.set(t.key, t);
+      const uniq = Array.from(uniqMap.values());
+
+      const now = Date.now();
+      const end = now + PV_CONFIG.TIME_WINDOW_HOURS * 60 * 60 * 1000;
+
+      const groups = new Map();
+      for (const t of uniq){
+        if (t.timeMs < now - PV_CONFIG.PAST_TOLERANCE_MS) continue;
+        if (t.timeMs > end) continue;
+
+        const gKey = `${t.line}||${t.destination}||${t.agency||""}||${t.lineColor||""}`;
+        if (!groups.has(gKey)){
+          groups.set(gKey, {
+            line: t.line,
+            destination: t.destination,
+            times: [],
+            agency: t.agency || "",
+            lineColor: t.lineColor || ""
+          });
+        }
+        groups.get(gKey).times.push(t.timeMs);
+      }
+
+      const cards = [];
+      for (const g of groups.values()){
+        g.times.sort((a,b)=>a-b);
+        if (!g.times.length) continue;
+
+        cards.push({
+          line: g.line,
+          destination: g.destination,
+          times: g.times,
+          nextTime: g.times[0],
+          agency: g.agency,
+          lineColor: g.lineColor
+        });
+      }
+
+      cards.sort((a,b)=>a.nextTime - b.nextTime);
+      return cards;
+    }
+
+    let directionsService = null;
+    let refreshTimer = null;
+    let STATION_LATLNG = null;
+
+    function requestDirectionsTo(dest){
+      return new Promise((resolve) => {
+        const req = {
+          origin: STATION_LATLNG,
+          destination: dest,
+          travelMode: google.maps.TravelMode.TRANSIT,
+          provideRouteAlternatives: true,
+          transitOptions: { departureTime: new Date() }
+        };
+
+        directionsService.route(req, (result, status) => {
+          if (status === "OK" && result) resolve({ ok:true, result });
+          else resolve({ ok:false, status });
+        });
+      });
+    }
+
+    async function refreshData(){
+      setStatus("Buscando linhas (varredura 360º)…");
+      if (!directionsService) directionsService = new google.maps.DirectionsService();
+
+      const destinations = buildSweepDestinations(STATION_LATLNG);
+      const responses = await Promise.all(destinations.map(d => requestDirectionsTo(d)));
+
+      const allTrips = [];
+      let okCount = 0;
+
+      for (const r of responses){
+        if (r.ok){
+          okCount++;
+          allTrips.push(...extractTripsFromDirectionsResult(r.result));
+        }
+      }
+
+      const cards = aggregateTrips(allTrips);
+      currentCards = cards;
+      await paginateCards(cards);
+
+      setUpdatedNow();
+
+      if (!okCount) setStatus("Sem resposta da API (verifique a KEY e restrições).");
+      else setStatus(`Próximas saídas (${PV_CONFIG.TIME_WINDOW_HOURS}h) • Linhas: ${cards.length}`);
+    }
+
+    function scheduleRefresh(){
+      if (refreshTimer) clearInterval(refreshTimer);
+      refreshTimer = setInterval(refreshData, PV_CONFIG.REFRESH_EVERY_MS);
+    }
+
+    (async function boot(){
+      try{
+        if (PV_CONFIG.DEMO_MODE){
+          await startDemoLoop();
+          window.addEventListener("resize", async () => { await paginateCards(currentCards || []); });
+          return;
+        }
+
+        setStatus("Carregando Google Maps…");
+        await loadGoogleMaps();
+        warnEl.style.display = "none";
+
+        setStatus("Localizando ponto…");
+        const geo = await geocodeStation(PV_CONFIG.STATION_QUERY);
+
+        STATION_LATLNG = {
+          lat: geo.geometry.location.lat(),
+          lng: geo.geometry.location.lng()
+        };
+
+        const title = buildTitleFromGeocode(geo);
+        subtitleEl.textContent = String(title || DEFAULT_STATION_FALLBACK).toUpperCase();
+
+        setStatus("Atualizando linhas…");
+        await refreshData();
+        scheduleRefresh();
+
+        window.addEventListener("resize", async () => { await paginateCards(currentCards || []); });
+      }catch(err){
+        console.warn(err);
+        warnEl.style.display = "block";
+        warnEl.textContent = "ERRO AO INICIAR. VERIFIQUE INTERNET, API KEY E O TEXTO DO ?station=...";
+        subtitleEl.textContent = DEFAULT_STATION_FALLBACK.toUpperCase();
+        setStatus("Aguardando configuração…");
+        footerUpdateEl.textContent = "ÚLTIMA ATUALIZAÇÃO • —";
+      }
+    })();
   </script>
 </body>
 </html>
