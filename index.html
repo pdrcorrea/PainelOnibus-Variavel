@@ -11,7 +11,7 @@
 
   <style>
     :root{
-      /* ====== MESMO ESTILO DO 1º CÓDIGO (PontoView) ====== */
+      /* ====== VISUAL PONTOVIEW (do painel de horários) ====== */
       --ink:#0e1b2a;
 
       --topA:#0b2a44;
@@ -36,10 +36,7 @@
 
       --dividerGrad: linear-gradient(90deg, rgba(44,106,163,0) 0%, rgba(44,106,163,.9) 18%, rgba(15,61,99,.95) 50%, rgba(44,106,163,.9) 82%, rgba(44,106,163,0) 100%);
 
-      --pillDark:#3a4656;
-      --pillDark2:#2f3845;
-
-      /* ====== ÔNIBUS (mantém sua lógica) ====== */
+      /* ====== ÔNIBUS ====== */
       --stageGap: 12px;
       --ok:#1fa765;
       --okSoft: rgba(31, 167, 101, .12);
@@ -56,7 +53,7 @@
       overflow:hidden;
     }
 
-    /* ====== Estrutura base (self-contained) ====== */
+    /* ====== Estrutura base ====== */
     .pvPage{ width:100vw; height:100vh; background:#fff; }
     .pvShell{
       width:100%;
@@ -67,7 +64,7 @@
       background:#fff;
     }
 
-    /* ====== HEADER (igual ao 1º código) ====== */
+    /* ====== HEADER ====== */
     .pvHeader{
       position:relative;
       background: linear-gradient(180deg, var(--topB) 0%, var(--topC) 42%, var(--topA) 100%);
@@ -92,7 +89,6 @@
         linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,0) 42%);
       opacity:.95;
     }
-
     .pvHeaderLeft, .pvHeaderRight{ position:relative; z-index:1; }
     .pvHeaderLeft{
       display:flex;
@@ -162,7 +158,7 @@
       white-space:nowrap;
     }
 
-    /* ====== SUBBAR (mantém estrutura para o script; visual mais limpo) ====== */
+    /* ====== SUBBAR (somente texto e paginação; sem barra aqui) ====== */
     .pvSubbar{
       flex:0 0 auto;
       padding: 10px var(--pad);
@@ -200,10 +196,8 @@
       opacity:.95;
       white-space:nowrap;
     }
-    /* mantém a barra antiga, mas escondida (vamos usar a barra “colada na linha degradê”) */
-    .pvBar{ display:none; }
 
-    /* ====== CONTENT / SHELL ====== */
+    /* ====== CONTENT ====== */
     .pvContent{
       flex:1 1 auto;
       min-height:0;
@@ -216,13 +210,11 @@
       border-radius: var(--radius);
       background: var(--panel);
       padding: clamp(12px, 1.4vw, 18px);
-      border: none;
-      box-shadow: none;
       min-height:0;
       overflow:hidden;
     }
 
-    /* ====== Barra degradê + progresso (igual ao 1º) ====== */
+    /* ====== Barra degradê + progresso (acima do rodapé) ====== */
     .progressWrap{
       flex:0 0 auto;
       padding: 0 var(--pad);
@@ -232,20 +224,21 @@
       height: 4px;
       border-radius: 999px;
       background: var(--dividerGrad);
-      position:relative;
-      overflow:hidden;
+      position: relative;
+      overflow: hidden;
     }
     #barFill{
       position:absolute;
       inset:0;
-      width: 0%;
-      background: linear-gradient(90deg, rgba(255,255,255,.10), rgba(255,255,255,.18));
+      width:0%;
+      background: linear-gradient(90deg, rgba(255,255,255,.15), rgba(255,255,255,.35));
       mix-blend-mode: screen;
-      transform-origin:left center;
       border-radius: 999px;
+      transition: width 120ms linear;
+      transform-origin:left center;
     }
 
-    /* ====== FOOTER (igual ao 1º) ====== */
+    /* ====== FOOTER ====== */
     .pvFooter{
       flex:0 0 auto;
       height: var(--footerH);
@@ -283,7 +276,7 @@
       opacity:.92;
     }
 
-    /* ====== ÔNIBUS: conteúdo (cards/paginação) com estética do 1º ====== */
+    /* ====== ÔNIBUS: cards/paginação ====== */
     .busWrap{
       height:100%;
       display:flex;
@@ -376,7 +369,6 @@
       color: #0e1b2a;
     }
 
-    /* empresa no “pill” (estilo do 1º) */
     .company{
       display:inline-flex;
       align-items:center;
@@ -392,14 +384,13 @@
       color:#23344a;
       white-space:nowrap;
       box-shadow: 0 8px 18px rgba(0,0,0,.04);
-      max-width: 220px;
+      max-width: 240px;
       overflow:hidden;
       text-overflow:ellipsis;
     }
     .dot{
       width:10px;height:10px;border-radius:999px;
-      background: currentColor;
-      opacity:.85;
+      opacity:.9;
       box-shadow: 0 0 0 3px rgba(15,61,99,.10);
       flex:0 0 auto;
     }
@@ -516,7 +507,6 @@
       backdrop-filter: blur(6px);
     }
 
-    /* ====== Responsivo (sem quebrar) ====== */
     @media (max-width: 980px){
       .card{
         min-height: 74px;
@@ -526,7 +516,7 @@
         border-radius: 16px;
       }
       .lineNum{ font-size: 30px; }
-      .company{ max-width: 190px; font-size: 10px; padding: 9px 10px; }
+      .company{ max-width: 200px; font-size: 10px; padding: 9px 10px; }
       .dot{ width: 9px; height: 9px; }
       .destName{ font-size: 22px; }
 
@@ -557,7 +547,6 @@
   <div class="pvPage">
     <div class="pvShell" id="pvPanel"
       data-title="HORÁRIOS DE SAÍDA"
-      data-subtitle="ESTAÇÃO"
       data-subleft="Próximas saídas (2h) • Next Bus">
 
       <!-- HEADER -->
@@ -577,6 +566,7 @@
 
           <div class="pvTitles">
             <h1 class="pvTitle" id="pvTitle"></h1>
+            <!-- SUBTITLE = LOCALIZAÇÃO (vem do STATION_QUERY após geocode) -->
             <div class="pvSubtitle" id="pvSubtitle"></div>
           </div>
         </div>
@@ -586,12 +576,11 @@
         </div>
       </header>
 
-      <!-- SUBBAR (mantida para o script; visual mais clean) -->
+      <!-- SUBBAR -->
       <div class="pvSubbar">
         <div class="pvSubLeft" id="pvSubLeft"></div>
         <div class="pvSubRight">
           <span class="pvPageLabel" id="pageLabel">PÁGINA 1/1</span>
-          <div class="pvBar" aria-hidden="true"><div></div></div>
         </div>
       </div>
 
@@ -605,7 +594,7 @@
         </section>
       </main>
 
-      <!-- barra “colada” na linha degradê (usa o MESMO id barFill do seu script) -->
+      <!-- PROGRESS (virada de página) -->
       <div class="progressWrap" aria-hidden="true">
         <div class="divider"><div id="barFill"></div></div>
       </div>
@@ -620,9 +609,9 @@
     </div>
   </div>
 
+  <!-- KEY vem do config.js geral -->
   <script src="config.js"></script>
 
-  <!-- SEU SCRIPT ORIGINAL (comportamento preservado) -->
   <script>
     /*******************************************************************
      * INIT PADRÃO (título/subbar/relógio)
@@ -634,7 +623,6 @@
     const footerUpdateEl = document.getElementById("pvFooterUpdate");
 
     titleEl.textContent = panel.dataset.title || "";
-    subtitleEl.textContent = (panel.dataset.subtitle || "").toUpperCase();
     subLeftEl.textContent = panel.dataset.subleft || "";
 
     function pad2(n){ return String(n).padStart(2,"0"); }
@@ -665,6 +653,7 @@
 
     const PV_CONFIG = {
       DEMO_MODE: Q.demo,
+      // você pode editar aqui ou passar via URL ?station=
       STATION_QUERY: Q.station || "Av. Ângelo Giuberti, 291 - Esplanada, Colatina - ES, 29702-060",
 
       TIME_WINDOW_HOURS: 2,
@@ -749,8 +738,6 @@
       el.className = "card";
 
       const stripeColor = (card.lineColor || "").trim() || "#0f3f82";
-      const dotColor = stripeColor;
-
       const next = fmtHHMM(card.times[0]);
       const rest = card.times.slice(1);
 
@@ -771,9 +758,9 @@
       el.innerHTML = `
         <div class="lineCol">
           <div class="lineNum">${escapeHtml(card.line)}</div>
-          <div class="company" title="${escapeHtml(agencyLabel)}" style="color:${escapeHtml(dotColor)}">
-            <span class="dot" style="background:${escapeHtml(dotColor)}"></span>
-            <span style="color:#23344a">${escapeHtml(agencyLabel)}</span>
+          <div class="company" title="${escapeHtml(agencyLabel)}">
+            <span class="dot" style="background:${escapeHtml(stripeColor)}"></span>
+            <span>${escapeHtml(agencyLabel)}</span>
           </div>
         </div>
 
@@ -1202,8 +1189,8 @@
           lng: geo.geometry.location.lng()
         };
 
-        const title = buildTitleFromGeocode(geo);
-        subtitleEl.textContent = String(title || DEFAULT_STATION_FALLBACK).toUpperCase();
+        const locTitle = buildTitleFromGeocode(geo);
+        subtitleEl.textContent = String(locTitle || DEFAULT_STATION_FALLBACK).toUpperCase();
 
         setStatus("Atualizando linhas…");
         await refreshData();
@@ -1213,7 +1200,7 @@
       }catch(err){
         console.warn(err);
         warnEl.style.display = "block";
-        warnEl.textContent = "ERRO AO INICIAR. VERIFIQUE INTERNET, API KEY E O TEXTO DO ?station=...";
+        warnEl.textContent = "ERRO AO INICIAR: " + (err?.message || String(err));
         subtitleEl.textContent = DEFAULT_STATION_FALLBACK.toUpperCase();
         setStatus("Aguardando configuração…");
         footerUpdateEl.textContent = "ÚLTIMA ATUALIZAÇÃO • —";
