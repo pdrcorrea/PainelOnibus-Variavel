@@ -11,7 +11,6 @@
 
   <style>
     :root{
-      /* ====== VISUAL PONTOVIEW (do painel de horários) ====== */
       --ink:#0e1b2a;
 
       --topA:#0b2a44;
@@ -36,10 +35,11 @@
 
       --dividerGrad: linear-gradient(90deg, rgba(44,106,163,0) 0%, rgba(44,106,163,.9) 18%, rgba(15,61,99,.95) 50%, rgba(44,106,163,.9) 82%, rgba(44,106,163,0) 100%);
 
-      /* ====== ÔNIBUS ====== */
+      --pillDark:#3a4656;
+      --pillDark2:#2f3845;
+
       --stageGap: 12px;
       --ok:#1fa765;
-      --okSoft: rgba(31, 167, 101, .12);
     }
 
     *{box-sizing:border-box}
@@ -53,7 +53,6 @@
       overflow:hidden;
     }
 
-    /* ====== Estrutura base ====== */
     .pvPage{ width:100vw; height:100vh; background:#fff; }
     .pvShell{
       width:100%;
@@ -64,7 +63,7 @@
       background:#fff;
     }
 
-    /* ====== HEADER ====== */
+    /* ===== HEADER ===== */
     .pvHeader{
       position:relative;
       background: linear-gradient(180deg, var(--topB) 0%, var(--topC) 42%, var(--topA) 100%);
@@ -158,7 +157,7 @@
       white-space:nowrap;
     }
 
-    /* ====== SUBBAR (somente texto e paginação; sem barra aqui) ====== */
+    /* ===== SUBBAR ===== */
     .pvSubbar{
       flex:0 0 auto;
       padding: 10px var(--pad);
@@ -197,7 +196,7 @@
       white-space:nowrap;
     }
 
-    /* ====== CONTENT ====== */
+    /* ===== CONTENT ===== */
     .pvContent{
       flex:1 1 auto;
       min-height:0;
@@ -214,7 +213,7 @@
       overflow:hidden;
     }
 
-    /* ====== Barra degradê + progresso (acima do rodapé) ====== */
+    /* ===== PROGRESS (virada de página) ===== */
     .progressWrap{
       flex:0 0 auto;
       padding: 0 var(--pad);
@@ -238,7 +237,7 @@
       transform-origin:left center;
     }
 
-    /* ====== FOOTER ====== */
+    /* ===== FOOTER ===== */
     .pvFooter{
       flex:0 0 auto;
       height: var(--footerH);
@@ -261,7 +260,48 @@
       overflow:hidden;
       text-overflow:ellipsis;
       min-width: 0;
+      max-width: 36vw;
     }
+
+    /* ===== LEGENDA (empresas) no rodapé ===== */
+    .brands{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content:center;
+      min-width:0;
+      flex: 1 1 auto;
+      overflow:hidden;
+    }
+    .brandPill{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--pillDark) 0%, var(--pillDark2) 100%);
+      border: 1px solid rgba(255,255,255,.12);
+      color:#fff;
+      font-weight: 900;
+      letter-spacing:.10em;
+      text-transform: uppercase;
+      font-size: 11px;
+      white-space:nowrap;
+      box-shadow: 0 10px 18px rgba(0,0,0,.14);
+      max-width: 100%;
+    }
+    .brandDot{
+      width:10px;height:10px;border-radius:999px;
+      background: var(--c, #2c6aa3);
+      box-shadow: 0 0 0 3px rgba(255,255,255,.10);
+      flex:0 0 auto;
+    }
+    .brandTxt{
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 22vw;
+    }
+
     .pvFooterRight{
       display:flex;
       align-items:center;
@@ -276,7 +316,7 @@
       opacity:.92;
     }
 
-    /* ====== ÔNIBUS: cards/paginação ====== */
+    /* ===== ÔNIBUS ===== */
     .busWrap{
       height:100%;
       display:flex;
@@ -284,7 +324,6 @@
       min-height:0;
       gap: 12px;
     }
-
     .warn{
       display:none;
       padding: 12px 14px;
@@ -297,7 +336,6 @@
       letter-spacing: .10em;
       text-transform: uppercase;
     }
-
     .stage{
       position:relative;
       flex: 1;
@@ -305,7 +343,6 @@
       overflow:hidden;
       background: transparent;
     }
-
     .page{
       position:absolute;
       inset: 0;
@@ -334,7 +371,7 @@
       border-radius: var(--radiusCard);
       padding: clamp(12px, 1.3vw, 16px);
       display:grid;
-      grid-template-columns: 140px 1fr 260px;
+      grid-template-columns: 120px 1fr 260px;
       align-items:center;
       gap: clamp(12px, 1.4vw, 18px);
       min-width:0;
@@ -356,7 +393,7 @@
     .lineCol{
       display:flex;
       flex-direction:column;
-      gap: 10px;
+      gap: 6px;
       align-items:flex-start;
       padding-left: 10px;
       min-width:0;
@@ -368,37 +405,14 @@
       line-height: 1;
       color: #0e1b2a;
     }
-
-    .company{
-      display:inline-flex;
-      align-items:center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius:999px;
-      background: #fff;
-      border:1px solid rgba(231,233,238,.95);
+    .lineMini{
       font-size: 11px;
       font-weight: 900;
-      letter-spacing:.10em;
+      letter-spacing:.12em;
       text-transform: uppercase;
-      color:#23344a;
-      white-space:nowrap;
-      box-shadow: 0 8px 18px rgba(0,0,0,.04);
-      max-width: 240px;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .dot{
-      width:10px;height:10px;border-radius:999px;
+      color:#3b4b62;
       opacity:.9;
-      box-shadow: 0 0 0 3px rgba(15,61,99,.10);
-      flex:0 0 auto;
-    }
-    .company span:last-child{
-      overflow:hidden;
-      text-overflow:ellipsis;
       white-space:nowrap;
-      min-width:0;
     }
 
     .destCol{
@@ -516,8 +530,6 @@
         border-radius: 16px;
       }
       .lineNum{ font-size: 30px; }
-      .company{ max-width: 200px; font-size: 10px; padding: 9px 10px; }
-      .dot{ width: 9px; height: 9px; }
       .destName{ font-size: 22px; }
 
       .timeRow{ max-width: 220px; gap: 9px; }
@@ -526,6 +538,9 @@
       .next .label{ font-size: 10px; margin-top: 5px; }
       .nextSide{ width: 105px; padding: 9px 9px; border-radius: 16px; }
       .nextSideItem{ font-size: 10px; padding: 6px 7px; }
+
+      .brandTxt{ max-width: 26vw; }
+      .pvFooterLeft{ max-width: 42vw; }
     }
 
     @media (max-width: 640px){
@@ -534,11 +549,13 @@
       .timeRow{ max-width: 190px; gap: 8px; }
       .nextSide{ width: 92px; }
       .nextSideItem{ font-size: 10px; padding: 5px 6px; }
+      .brandTxt{ max-width: 32vw; }
     }
 
     @media (orientation: portrait){
       .pvCard{ padding: clamp(10px, 1.2vw, 14px); }
       .card{ grid-template-columns: 120px 1fr 240px; }
+      .brandTxt{ max-width: 24vw; }
     }
   </style>
 </head>
@@ -549,11 +566,9 @@
       data-title="HORÁRIOS DE SAÍDA"
       data-subleft="Próximas saídas (2h) • Next Bus">
 
-      <!-- HEADER -->
       <header class="pvHeader">
         <div class="pvHeaderLeft">
-          <div class="pvIconBadge" aria-hidden="true" id="pvBadge">
-            <!-- Ícone ÔNIBUS -->
+          <div class="pvIconBadge" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M8 6h8a4 4 0 0 1 4 4v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7a4 4 0 0 1 4-4Z"/>
               <path d="M6 16h12"/>
@@ -566,7 +581,6 @@
 
           <div class="pvTitles">
             <h1 class="pvTitle" id="pvTitle"></h1>
-            <!-- SUBTITLE = LOCALIZAÇÃO (vem do STATION_QUERY após geocode) -->
             <div class="pvSubtitle" id="pvSubtitle"></div>
           </div>
         </div>
@@ -576,7 +590,6 @@
         </div>
       </header>
 
-      <!-- SUBBAR -->
       <div class="pvSubbar">
         <div class="pvSubLeft" id="pvSubLeft"></div>
         <div class="pvSubRight">
@@ -584,7 +597,6 @@
         </div>
       </div>
 
-      <!-- CONTENT -->
       <main class="pvContent">
         <section class="pvCard">
           <div class="busWrap">
@@ -594,14 +606,16 @@
         </section>
       </main>
 
-      <!-- PROGRESS (virada de página) -->
       <div class="progressWrap" aria-hidden="true">
         <div class="divider"><div id="barFill"></div></div>
       </div>
 
-      <!-- FOOTER -->
       <footer class="pvFooter">
         <div class="pvFooterLeft" id="pvFooterUpdate">ÚLTIMA ATUALIZAÇÃO • —</div>
+
+        <!-- LEGENDA DE CORES / EMPRESAS -->
+        <div class="brands" id="brands"></div>
+
         <div class="pvFooterRight">
           <img class="pvLogo" src="./assets/logo-pontoview.png" alt="PontoView" />
         </div>
@@ -609,37 +623,28 @@
     </div>
   </div>
 
-  <!-- KEY vem do config.js geral -->
   <script src="config.js"></script>
 
   <script>
-    /*******************************************************************
-     * INIT PADRÃO (título/subbar/relógio)
-     *******************************************************************/
     const panel = document.getElementById("pvPanel");
     const titleEl = document.getElementById("pvTitle");
     const subtitleEl = document.getElementById("pvSubtitle");
     const subLeftEl = document.getElementById("pvSubLeft");
     const footerUpdateEl = document.getElementById("pvFooterUpdate");
+    const brandsEl = document.getElementById("brands");
 
     titleEl.textContent = panel.dataset.title || "";
     subLeftEl.textContent = panel.dataset.subleft || "";
 
     function pad2(n){ return String(n).padStart(2,"0"); }
     function hhmm(d=new Date()){ return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`; }
-
     function tickClock(){ document.getElementById("pvClock").textContent = hhmm(); }
     tickClock();
     const msToNextSecond = 1000 - new Date().getMilliseconds();
     setTimeout(() => { tickClock(); setInterval(tickClock, 1000); }, msToNextSecond);
-
     function setUpdatedNow(){ footerUpdateEl.textContent = `ÚLTIMA ATUALIZAÇÃO • ${hhmm()}`; }
 
-    /*******************************************************************
-     * PAINEL DE CONFIGURAÇÃO POR URL
-     *******************************************************************/
     const DEFAULT_STATION_FALLBACK = "Centro da Cidade";
-
     function getQuery(){
       const q = new URLSearchParams(location.search);
       const station = (q.get("station") || "").trim();
@@ -653,7 +658,6 @@
 
     const PV_CONFIG = {
       DEMO_MODE: Q.demo,
-      // você pode editar aqui ou passar via URL ?station=
       STATION_QUERY: Q.station || "Av. Ângelo Giuberti, 291 - Esplanada, Colatina - ES, 29702-060",
 
       TIME_WINDOW_HOURS: 2,
@@ -667,9 +671,8 @@
       DEMO_REFRESH_SEC: 25,
       DEMO_HEADSIGN_POOL: ["COHAB","AROEIRA","SANTA TEREZA","CENTRO","BAIRRO INDUSTRIAL","RIVIERA","AYRTON SENNA"],
       DEMO_AGENCIES: [
+        { name:"PREFEITURA DE COLATINA", color:"#0f3f82" },
         { name:"VIAÇÃO SÃO GABRIEL", color:"#f3c316" },
-        { name:"VIAÇÃO JOANA DARC", color:"#0f3f82" },
-        { name:"VIAÇÃO SÃO ROQUE", color:"#5fc2ff" },
         { name:"TRANS COLATINA", color:"#ff7a00" }
       ]
     };
@@ -707,6 +710,35 @@
       return clusters.map(c => c.length === 1 ? fmtHHMM(c[0]) : `${fmtHHMM(c[0])}–${fmtHHMM(c[c.length-1])}`);
     }
 
+    /* ====== LEGENDA (empresas) ====== */
+    function renderLegendFromCards(cards){
+      const map = new Map(); // name -> color
+      (cards || []).forEach(c => {
+        const name = (c.agency || "").trim();
+        const color = (c.lineColor || "").trim();
+        if (!name) return;
+        if (!map.has(name)) map.set(name, color || "#2c6aa3");
+      });
+
+      brandsEl.innerHTML = "";
+      const entries = Array.from(map.entries());
+
+      // Se não tiver agência (caso raro), esconde a legenda
+      if (!entries.length){
+        brandsEl.style.display = "none";
+        return;
+      }
+      brandsEl.style.display = "flex";
+
+      entries.forEach(([name, color]) => {
+        const pill = document.createElement("div");
+        pill.className = "brandPill";
+        pill.style.setProperty("--c", color);
+        pill.innerHTML = `<span class="brandDot"></span><span class="brandTxt">${escapeHtml(name)}</span>`;
+        brandsEl.appendChild(pill);
+      });
+    }
+
     let currentCards = [];
     let pages = [];
     let pageIndex = 0;
@@ -733,6 +765,7 @@
       barFillEl.style.width = pct + "%";
     }
 
+    /* ====== CARD (SEM BADGE DE EMPRESA) ====== */
     function buildCardEl(card){
       const el = document.createElement("div");
       el.className = "card";
@@ -753,15 +786,10 @@
            </div>`
         : ``;
 
-      const agencyLabel = (card.agency || "").trim() || "ÔNIBUS";
-
       el.innerHTML = `
         <div class="lineCol">
           <div class="lineNum">${escapeHtml(card.line)}</div>
-          <div class="company" title="${escapeHtml(agencyLabel)}">
-            <span class="dot" style="background:${escapeHtml(stripeColor)}"></span>
-            <span>${escapeHtml(agencyLabel)}</span>
-          </div>
+          <div class="lineMini">LINHA</div>
         </div>
 
         <div class="destCol">
@@ -813,6 +841,9 @@
       pages = [];
       pageIndex = 0;
 
+      // >>> atualiza legenda conforme dados atuais
+      renderLegendFromCards(cards);
+
       if (!cards.length){
         const p = document.createElement("div");
         p.className = "page active";
@@ -830,7 +861,6 @@
         const chunk = cards.slice(i, i+perPage);
         const page = document.createElement("div");
         page.className = "page";
-
         for (const c of chunk) page.appendChild(buildCardEl(c));
         stageEl.appendChild(page);
         pages.push(page);
@@ -843,7 +873,6 @@
 
     function showPage(nextIndex){
       if (!pages.length) return;
-
       const from = pages[pageIndex];
       const to = pages[nextIndex];
       if (from === to) return;
