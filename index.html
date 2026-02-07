@@ -11,7 +11,6 @@
 
   <style>
     :root{
-      /* ===== CONTRASTE (TV) + Padrão PontoView ===== */
       --ink:#0b1626;
 
       --topA:#0b2a44;
@@ -21,7 +20,6 @@
       --pad: clamp(14px, 1.8vw, 26px);
       --gap: clamp(12px, 1.4vw, 18px);
 
-      /* menos “branco estourado” */
       --panel:#e7edf5;
       --card: rgba(255,255,255,.78);
       --line: rgba(210,222,238,.95);
@@ -180,12 +178,6 @@
       overflow:hidden;
       text-overflow:ellipsis;
     }
-    .pvSubRight{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      min-width:max-content;
-    }
     .pvPageLabel{
       font-size: 11px;
       font-weight: 900;
@@ -263,7 +255,7 @@
       transition: opacity var(--anim) var(--ease), transform var(--anim) var(--ease);
     }
 
-    /* ===== CARD (economia de espaço) ===== */
+    /* ===== CARD (padrão landscape) ===== */
     .card{
       background: var(--card);
       border: 1px solid var(--line);
@@ -292,7 +284,7 @@
     .lineCol{
       display:flex;
       flex-direction:column;
-      gap: 6px;
+      gap: 2px;
       align-items:flex-start;
       padding-left: 10px;
       min-width:0;
@@ -303,20 +295,12 @@
       letter-spacing: .02em;
       line-height: 1;
       color: var(--ink);
-    }
-    .lineMini{
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing:.12em;
-      text-transform: uppercase;
-      color:#3b4b62;
-      opacity:.92;
-      white-space:nowrap;
+      font-variant-numeric: tabular-nums;
     }
 
     .destCol{ min-width:0; }
 
-    /* ===== MARQUEE SUAVE + FADE SÓ NA DIREITA (opção A) ===== */
+    /* ===== DESTINO (marquee + fade só na direita) ===== */
     .destName{
       position: relative;
       min-width: 0;
@@ -328,7 +312,6 @@
       text-transform: uppercase;
       color: var(--ink);
       padding-right: 18px;
-
       mask-image: linear-gradient(90deg, #000 0, #000 84%, rgba(0,0,0,.0) 100%);
       -webkit-mask-image: linear-gradient(90deg, #000 0, #000 84%, rgba(0,0,0,.0) 100%);
     }
@@ -342,19 +325,18 @@
     }
     @keyframes pvMarquee{
       0%{ transform: translateX(0); }
-      10%{ transform: translateX(0); } /* pausa inicial */
+      10%{ transform: translateX(0); }
       90%{ transform: translateX(calc(-1 * var(--marqMove, 0px))); }
-      100%{ transform: translateX(calc(-1 * var(--marqMove, 0px))); } /* pausa final */
+      100%{ transform: translateX(calc(-1 * var(--marqMove, 0px))); }
     }
 
-    /* ===== HORÁRIOS (mais discreto e menor) ===== */
+    /* ===== HORÁRIOS (discreto) ===== */
     .timesCol{
       display:flex;
       flex-direction:column;
       align-items:flex-end;
       width: 100%;
     }
-
     .timeRow{
       width: 100%;
       max-width: 168px;
@@ -479,7 +461,7 @@
       transform-origin:left center;
     }
 
-    /* ===== FOOTER (sem atualização) ===== */
+    /* ===== FOOTER (legenda deve mostrar TODAS) ===== */
     .pvFooter{
       flex:0 0 auto;
       height: var(--footerH);
@@ -499,13 +481,18 @@
       justify-content:center;
       min-width:0;
       flex: 1 1 auto;
-      overflow:hidden;
+
+      /* IMPORTANTE: não cortar as demais pills */
+      flex-wrap: wrap;
+      overflow: visible;
+      row-gap: 8px;
     }
+
     .brandPill{
       display:inline-flex;
       align-items:center;
       gap:10px;
-      padding: 10px 14px;
+      padding: 9px 12px;
       border-radius: 999px;
       background: linear-gradient(180deg, var(--pillDark) 0%, var(--pillDark2) 100%);
       border: 1px solid rgba(255,255,255,.12);
@@ -513,7 +500,7 @@
       font-weight: 900;
       letter-spacing:.10em;
       text-transform: uppercase;
-      font-size: 11px;
+      font-size: 10px;
       white-space:nowrap;
       box-shadow: 0 10px 18px rgba(0,0,0,.14);
       max-width: 100%;
@@ -527,7 +514,7 @@
     .brandTxt{
       overflow:hidden;
       text-overflow:ellipsis;
-      max-width: 36vw;
+      max-width: min(44vw, 420px);
     }
 
     .pvFooterRight{
@@ -544,11 +531,40 @@
       opacity:.92;
     }
 
+    /* ===== AJUSTE PRINCIPAL PEDIDO: em portrait, destino embaixo do número ===== */
+    @media (orientation: portrait){
+      /* dá um pouco mais de altura pro rodapé caber 2 linhas de legenda */
+      .pvFooter{ height: clamp(76px, 9vh, 112px); }
+
+      /* reorganiza grid do card */
+      .card{
+        grid-template-columns: 120px 1fr;
+        grid-template-rows: auto auto;
+        grid-template-areas:
+          "line times"
+          "dest dest";
+        align-items:start;
+        row-gap: 10px;
+        min-height: 96px;
+      }
+      .lineCol{ grid-area: line; }
+      .timesCol{ grid-area: times; }
+      .destCol{ grid-area: dest; }
+
+      /* destino ganha mais espaço horizontal agora */
+      .destName{
+        font-size: clamp(18px, 2.35vw, 30px);
+        padding-right: 22px;
+      }
+
+      /* horários ficam mais compactos */
+      .timeRow{ max-width: 172px; }
+      .nextSide{ width: 70px; }
+    }
+
     @media (max-width: 640px){
-      .card{ grid-template-columns: 92px minmax(0, 1fr) 176px; }
       .timeRow{ max-width: 160px; }
       .nextSide{ width: 66px; }
-      .brandTxt{ max-width: 34vw; }
     }
   </style>
 </head>
@@ -648,9 +664,7 @@
     const Q = getQuery();
 
     const PV_CONFIG = {
-      /* Local exibido no subtítulo vem do geocode da station */
-      STATION_QUERY: Q.station || "Av. Afonso Pena - Centro, Campo Grande - MS, 79072-444",
-
+      STATION_QUERY: Q.station || "Av. Ângelo Giuberti, 291 - Esplanada, Colatina - ES, 29702-060",
       TIME_WINDOW_HOURS: 2,
       SWEEP_POINTS: 12,
       SWEEP_RADIUS_M: 1200,
@@ -692,7 +706,7 @@
       return clusters.map(c => c.length === 1 ? fmtHHMM(c[0]) : `${fmtHHMM(c[0])}–${fmtHHMM(c[c.length-1])}`);
     }
 
-    /* ====== LEGENDA NO RODAPÉ (todas as empresas) ====== */
+    /* ====== LEGENDA NO RODAPÉ (não cortar + listar todos os rótulos) ====== */
     function renderLegendFromCards(cards){
       const freq = new Map(); // name -> {color,count}
       (cards || []).forEach(c => {
@@ -719,12 +733,13 @@
         const pill = document.createElement("div");
         pill.className = "brandPill";
         pill.style.setProperty("--c", info.color);
+        pill.title = name;
         pill.innerHTML = `<span class="brandDot"></span><span class="brandTxt">${escapeHtml(name)}</span>`;
         brandsEl.appendChild(pill);
       });
     }
 
-    /* ====== MARQUEE (só quando texto for grande) ====== */
+    /* ====== MARQUEE (só quando overflow) ====== */
     function applyMarquee(root = document){
       const nodes = root.querySelectorAll(".destName");
       nodes.forEach(n => {
@@ -739,8 +754,7 @@
         if (over > 18){
           n.classList.add("is-marquee");
           n.style.setProperty("--marqMove", `${over}px`);
-
-          const pxPerSec = 40; // suave
+          const pxPerSec = 40;
           const seconds = Math.max(8, Math.min(18, over / pxPerSec + 6));
           n.style.setProperty("--marqDur", `${seconds}s`);
         }
@@ -773,12 +787,11 @@
       barFillEl.style.width = pct + "%";
     }
 
-    /* ====== CARD (SEM BADGE DE EMPRESA) ====== */
     function buildCardEl(card){
       const el = document.createElement("div");
       el.className = "card";
 
-      const stripeColor = (card.lineColor || "").trim() || "#0f3f82";
+      const stripeColor = (card.lineColor || "").trim() || "#0f3d63";
       const nextMs = card.times[0];
       const next = fmtHHMM(nextMs);
       const rest = card.times.slice(1);
@@ -802,7 +815,6 @@
       el.innerHTML = `
         <div class="lineCol">
           <div class="lineNum">${escapeHtml(card.line)}</div>
-          <div class="lineMini">LINHA</div>
         </div>
 
         <div class="destCol">
@@ -838,7 +850,7 @@
       await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
       const available = Math.max(0, stageEl.clientHeight);
-      const cardH = sample.getBoundingClientRect().height || 82;
+      const cardH = sample.getBoundingClientRect().height || 92;
       const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--stageGap")) || 12;
 
       stageEl.innerHTML = "";
@@ -1045,18 +1057,22 @@
           const depMs = toMillis(td.departure_time) || toMillis(td.departure_time?.value);
           if (!depMs) continue;
 
-          const agencyName =
+          /* Se agência não vier (muito comum), usamos um rótulo útil para a legenda.
+             Isso faz aparecer “várias” entradas no rodapé mesmo quando o GTFS não entrega agencies. */
+          const agencyFromApi =
             td.line?.agencies?.[0]?.name ||
             td.line?.agencies?.[0]?.short_name ||
-            td.line?.name ||
-            td.line?.short_name ||
-            "OPERADORA";
+            "";
+
+          const agencyLabel = agencyFromApi.trim()
+            ? agencyFromApi.trim()
+            : `LINHA ${String(lineShort).trim() || "—"}`;
 
           let lineColor = (td.line?.color || "").trim();
           if (!lineColor){
-            // cor determinística por agencyName (para legenda sempre listar "todas")
+            // cor determinística por rótulo (para legenda sempre ter cores distintas)
             let h = 0;
-            for (let i=0;i<agencyName.length;i++) h = (h*31 + agencyName.charCodeAt(i)) >>> 0;
+            for (let i=0;i<agencyLabel.length;i++) h = (h*31 + agencyLabel.charCodeAt(i)) >>> 0;
             const hue = h % 360;
             lineColor = `hsl(${hue} 75% 45%)`;
           }
@@ -1065,9 +1081,9 @@
             line: String(lineShort),
             destination: String(headsign),
             timeMs: depMs,
-            agency: String(agencyName || "").trim(),
+            agency: agencyLabel,
             lineColor,
-            key: `${String(lineShort)}|${String(headsign)}|${depMs}|${String(agencyName||"")}|${String(lineColor||"")}`
+            key: `${String(lineShort)}|${String(headsign)}|${depMs}|${agencyLabel}|${String(lineColor||"")}`
           });
         }
       }
