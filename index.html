@@ -21,11 +21,10 @@
       --pad: clamp(14px, 1.8vw, 26px);
       --gap: clamp(12px, 1.4vw, 18px);
 
-      /* mais contraste que o “branco estourado” */
+      /* menos “branco estourado” */
       --panel:#e7edf5;
       --card: rgba(255,255,255,.78);
       --line: rgba(210,222,238,.95);
-      --muted:#5b6b82;
 
       --radius: clamp(24px, 2.2vw, 36px);
       --radiusCard: clamp(18px, 1.8vw, 28px);
@@ -41,7 +40,6 @@
       --pillDark2:#2f3845;
 
       --stageGap: 12px;
-      --ok:#1fa765;
     }
 
     *{box-sizing:border-box}
@@ -216,97 +214,7 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,.45);
     }
 
-    /* ===== PROGRESS (virada de página) ===== */
-    .progressWrap{
-      flex:0 0 auto;
-      padding: 0 var(--pad);
-      background:#fff;
-    }
-    .divider{
-      height: 4px;
-      border-radius: 999px;
-      background: var(--dividerGrad);
-      position: relative;
-      overflow: hidden;
-    }
-    #barFill{
-      position:absolute;
-      inset:0;
-      width:0%;
-      background: linear-gradient(90deg, rgba(255,255,255,.16), rgba(255,255,255,.38));
-      mix-blend-mode: screen;
-      border-radius: 999px;
-      transition: width 120ms linear;
-      transform-origin:left center;
-    }
-
-    /* ===== FOOTER (sem “atualização”) ===== */
-    .pvFooter{
-      flex:0 0 auto;
-      height: var(--footerH);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding: 10px var(--pad);
-      background:#fff;
-      gap: 12px;
-      min-width:0;
-    }
-
-    /* legenda central */
-    .brands{
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      justify-content:center;
-      min-width:0;
-      flex: 1 1 auto;
-      overflow:hidden;
-    }
-    .brandPill{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, var(--pillDark) 0%, var(--pillDark2) 100%);
-      border: 1px solid rgba(255,255,255,.12);
-      color:#fff;
-      font-weight: 900;
-      letter-spacing:.10em;
-      text-transform: uppercase;
-      font-size: 11px;
-      white-space:nowrap;
-      box-shadow: 0 10px 18px rgba(0,0,0,.14);
-      max-width: 100%;
-    }
-    .brandDot{
-      width:10px;height:10px;border-radius:999px;
-      background: var(--c, #2c6aa3);
-      box-shadow: 0 0 0 3px rgba(255,255,255,.10);
-      flex:0 0 auto;
-    }
-    .brandTxt{
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width: 36vw;
-    }
-
-    .pvFooterRight{
-      display:flex;
-      align-items:center;
-      justify-content:flex-end;
-      gap: 10px;
-      flex:0 0 auto;
-    }
-    .pvLogo{
-      height: clamp(16px, 2.3vh, 22px);
-      width:auto;
-      display:block;
-      opacity:.92;
-    }
-
-    /* ===== ÔNIBUS ===== */
+    /* ===== STAGE / PÁGINAS ===== */
     .busWrap{
       height:100%;
       display:flex;
@@ -362,7 +270,7 @@
       border-radius: var(--radiusCard);
       padding: clamp(12px, 1.25vw, 15px);
       display:grid;
-      grid-template-columns: 104px minmax(0, 1fr) 200px;
+      grid-template-columns: 96px minmax(0, 1fr) 188px;
       align-items:center;
       gap: clamp(10px, 1.3vw, 16px);
       min-width:0;
@@ -370,7 +278,7 @@
       backdrop-filter: blur(7px);
       position:relative;
       overflow:hidden;
-      min-height: 86px;
+      min-height: 82px;
     }
 
     .stripe{
@@ -406,31 +314,24 @@
       white-space:nowrap;
     }
 
-    .destCol{
-      min-width:0;
-      display:flex;
-      flex-direction:column;
-      gap: 6px;
-    }
+    .destCol{ min-width:0; }
 
-    /* ===== MARQUEE SUAVE (apenas quando precisar) ===== */
+    /* ===== MARQUEE SUAVE + FADE SÓ NA DIREITA (opção A) ===== */
     .destName{
-  position: relative;
-  min-width: 0;
-  overflow:hidden;
-  white-space:nowrap;
-  font-size: clamp(18px, 1.95vw, 30px);
-  font-weight: 900;
-  letter-spacing: .02em;
-  text-transform: uppercase;
-  color: var(--ink);
-  padding-right: 16px;
+      position: relative;
+      min-width: 0;
+      overflow:hidden;
+      white-space:nowrap;
+      font-size: clamp(18px, 1.95vw, 30px);
+      font-weight: 900;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+      color: var(--ink);
+      padding-right: 18px;
 
-  /* FADE MAIS SUTIL E APENAS NO FINAL (DIREITA) */
-  mask-image: linear-gradient(90deg, #000 0, #000 84%, rgba(0,0,0,.0) 100%);
-  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 84%, rgba(0,0,0,.0) 100%);
-}
-
+      mask-image: linear-gradient(90deg, #000 0, #000 84%, rgba(0,0,0,.0) 100%);
+      -webkit-mask-image: linear-gradient(90deg, #000 0, #000 84%, rgba(0,0,0,.0) 100%);
+    }
     .destText{
       display:inline-block;
       white-space:nowrap;
@@ -446,17 +347,17 @@
       100%{ transform: translateX(calc(-1 * var(--marqMove, 0px))); } /* pausa final */
     }
 
+    /* ===== HORÁRIOS (mais discreto e menor) ===== */
     .timesCol{
       display:flex;
       flex-direction:column;
       align-items:flex-end;
-      gap: 10px;
       width: 100%;
     }
 
     .timeRow{
       width: 100%;
-      max-width: 200px;
+      max-width: 168px;
       display:flex;
       align-items: stretch;
       gap: 8px;
@@ -465,60 +366,78 @@
 
     .next{
       flex: 1 1 auto;
-      text-align:center;
+      text-align:left;
       padding: 8px 10px;
-      border-radius: 16px;
-      background: rgba(31, 167, 101, .10);
-      border: 1px solid rgba(31, 167, 101, .20);
+      border-radius: 14px;
+      background: rgba(15,61,99,.08);
+      border: 1px solid rgba(15,61,99,.16);
       display:flex;
-      flex-direction: column;
-      justify-content: center;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
       height: 100%;
-      box-shadow: 0 8px 18px rgba(0,0,0,.05);
+      box-shadow: 0 6px 14px rgba(0,0,0,.04);
     }
     .next .when{
-      font-size: clamp(22px, 2.15vw, 34px);
+      font-size: clamp(18px, 1.8vw, 26px);
       font-weight: 900;
       letter-spacing: .04em;
-      color: rgba(31, 167, 101, .95);
-      line-height: 1.05;
+      color: rgba(11,22,38,.95);
+      line-height: 1;
       font-variant-numeric: tabular-nums;
     }
     .next .label{
-      margin-top: 4px;
+      margin: 4px 0 0 0;
       font-size: 10px;
       font-weight: 900;
-      letter-spacing: .16em;
+      letter-spacing: .14em;
       text-transform: uppercase;
-      color: rgba(31, 167, 101, .72);
+      color: rgba(52,66,87,.92);
+      white-space:nowrap;
+    }
+    .next .statusDot{
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      background: rgba(59,130,246,.92);
+      box-shadow: 0 0 0 3px rgba(59,130,246,.16);
+      flex:0 0 auto;
+    }
+    .next.is-soon{
+      background: rgba(31,167,101,.10);
+      border-color: rgba(31,167,101,.22);
+    }
+    .next.is-soon .statusDot{
+      background: rgba(31,167,101,.95);
+      box-shadow: 0 0 0 3px rgba(31,167,101,.16);
     }
 
     .nextSide{
       flex: 0 0 auto;
-      width: 92px;
-      border-radius: 16px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.68);
-      padding: 8px 8px;
+      width: 72px;
+      border-radius: 14px;
+      border: 1px solid rgba(15,61,99,.14);
+      background: rgba(255,255,255,.55);
+      padding: 7px 7px;
       display:flex;
       flex-direction: column;
       justify-content: center;
       gap: 6px;
-      box-shadow: 0 8px 18px rgba(0,0,0,.05);
+      box-shadow: 0 6px 14px rgba(0,0,0,.04);
     }
     .nextSideItem{
       width: 100%;
       text-align:center;
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 900;
       letter-spacing: .10em;
       padding: 5px 6px;
       border-radius: 999px;
-      border: 1px solid rgba(15,61,99,.14);
-      background: rgba(15,61,99,.08);
+      border: 1px solid rgba(210,222,238,.95);
+      background: rgba(15,61,99,.06);
       color: rgba(11,22,38,.92);
       white-space: nowrap;
-      opacity: .95;
+      opacity: .98;
     }
 
     .empty{
@@ -536,19 +455,99 @@
       backdrop-filter: blur(7px);
     }
 
-    @media (orientation: portrait){
-      .card{
-        grid-template-columns: 96px minmax(0, 1fr) 188px;
-        min-height: 82px;
-      }
-      .timeRow{ max-width: 188px; }
-      .brandTxt{ max-width: 28vw; }
+    /* ===== PROGRESS (virada de página) ===== */
+    .progressWrap{
+      flex:0 0 auto;
+      padding: 0 var(--pad);
+      background:#fff;
+    }
+    .divider{
+      height: 4px;
+      border-radius: 999px;
+      background: var(--dividerGrad);
+      position: relative;
+      overflow: hidden;
+    }
+    #barFill{
+      position:absolute;
+      inset:0;
+      width:0%;
+      background: linear-gradient(90deg, rgba(255,255,255,.16), rgba(255,255,255,.38));
+      mix-blend-mode: screen;
+      border-radius: 999px;
+      transition: width 120ms linear;
+      transform-origin:left center;
+    }
+
+    /* ===== FOOTER (sem atualização) ===== */
+    .pvFooter{
+      flex:0 0 auto;
+      height: var(--footerH);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 10px var(--pad);
+      background:#fff;
+      gap: 12px;
+      min-width:0;
+    }
+
+    .brands{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content:center;
+      min-width:0;
+      flex: 1 1 auto;
+      overflow:hidden;
+    }
+    .brandPill{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--pillDark) 0%, var(--pillDark2) 100%);
+      border: 1px solid rgba(255,255,255,.12);
+      color:#fff;
+      font-weight: 900;
+      letter-spacing:.10em;
+      text-transform: uppercase;
+      font-size: 11px;
+      white-space:nowrap;
+      box-shadow: 0 10px 18px rgba(0,0,0,.14);
+      max-width: 100%;
+    }
+    .brandDot{
+      width:10px;height:10px;border-radius:999px;
+      background: var(--c, #2c6aa3);
+      box-shadow: 0 0 0 3px rgba(255,255,255,.10);
+      flex:0 0 auto;
+    }
+    .brandTxt{
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 36vw;
+    }
+
+    .pvFooterRight{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap: 10px;
+      flex:0 0 auto;
+    }
+    .pvLogo{
+      height: clamp(16px, 2.3vh, 22px);
+      width:auto;
+      display:block;
+      opacity:.92;
     }
 
     @media (max-width: 640px){
       .card{ grid-template-columns: 92px minmax(0, 1fr) 176px; }
-      .timeRow{ max-width: 176px; }
-      .nextSide{ width: 86px; }
+      .timeRow{ max-width: 160px; }
+      .nextSide{ width: 66px; }
       .brandTxt{ max-width: 34vw; }
     }
   </style>
@@ -558,7 +557,7 @@
   <div class="pvPage">
     <div class="pvShell" id="pvPanel"
       data-title="HORÁRIOS DE SAÍDA"
-      data-subleft="Próximas saídas (2h) • Next Bus">
+      data-subleft="Próximas saídas (2h)">
 
       <header class="pvHeader">
         <div class="pvHeaderLeft">
@@ -613,7 +612,7 @@
     </div>
   </div>
 
-  <!-- KEY vem do config.js geral -->
+  <!-- KEY vem do config.js geral: window.PONTOVIEW_GMAPS_KEY -->
   <script src="config.js"></script>
 
   <script>
@@ -644,16 +643,12 @@
     function getQuery(){
       const q = new URLSearchParams(location.search);
       const station = (q.get("station") || "").trim();
-      const demo = (q.get("demo") || "").trim();
-      return {
-        station: station || null,
-        demo: demo === "1" || demo.toLowerCase() === "true" || demo.toLowerCase() === "demo"
-      };
+      return { station: station || null };
     }
     const Q = getQuery();
 
     const PV_CONFIG = {
-      DEMO_MODE: Q.demo,
+      /* Local exibido no subtítulo vem do geocode da station */
       STATION_QUERY: Q.station || "Av. Afonso Pena - Centro, Campo Grande - MS, 79072-444",
 
       TIME_WINDOW_HOURS: 2,
@@ -661,16 +656,7 @@
       SWEEP_RADIUS_M: 1200,
       REFRESH_EVERY_MS: 30 * 60 * 1000,
       PAST_TOLERANCE_MS: 20_000,
-      CLUSTER_GAP_MIN: 2,
-
-      DEMO_LINES_COUNT: 18,
-      DEMO_REFRESH_SEC: 25,
-      DEMO_HEADSIGN_POOL: ["COHAB","AROEIRA","SANTA TEREZA","CENTRO","BAIRRO INDUSTRIAL","RIVIERA","AYRTON SENNA"],
-      DEMO_AGENCIES: [
-        { name:"PREFEITURA DE COLATINA", color:"#0f3f82" },
-        { name:"VIAÇÃO SÃO GABRIEL", color:"#f3c316" },
-        { name:"TRANS COLATINA", color:"#ff7a00" }
-      ]
+      CLUSTER_GAP_MIN: 2
     };
 
     const GOOGLE_MAPS_API_KEY = (window.PONTOVIEW_GMAPS_KEY || "").trim() || "COLE_SUA_API_KEY_AQUI";
@@ -706,29 +692,33 @@
       return clusters.map(c => c.length === 1 ? fmtHHMM(c[0]) : `${fmtHHMM(c[0])}–${fmtHHMM(c[c.length-1])}`);
     }
 
-    /* ====== LEGENDA NO RODAPÉ ====== */
+    /* ====== LEGENDA NO RODAPÉ (todas as empresas) ====== */
     function renderLegendFromCards(cards){
-      const map = new Map(); // name -> color
+      const freq = new Map(); // name -> {color,count}
       (cards || []).forEach(c => {
         const name = (c.agency || "").trim();
-        const color = (c.lineColor || "").trim();
         if (!name) return;
-        if (!map.has(name)) map.set(name, color || "#2c6aa3");
+        const color = (c.lineColor || "").trim() || "#2c6aa3";
+        const cur = freq.get(name) || { color, count: 0 };
+        cur.count += 1;
+        if (cur.color === "#2c6aa3" && color) cur.color = color;
+        freq.set(name, cur);
       });
 
-      brandsEl.innerHTML = "";
-      const entries = Array.from(map.entries());
+      const entries = Array.from(freq.entries())
+        .sort((a,b)=> (b[1].count - a[1].count) || a[0].localeCompare(b[0]));
 
+      brandsEl.innerHTML = "";
       if (!entries.length){
         brandsEl.style.display = "none";
         return;
       }
       brandsEl.style.display = "flex";
 
-      entries.forEach(([name, color]) => {
+      entries.forEach(([name, info]) => {
         const pill = document.createElement("div");
         pill.className = "brandPill";
-        pill.style.setProperty("--c", color);
+        pill.style.setProperty("--c", info.color);
         pill.innerHTML = `<span class="brandDot"></span><span class="brandTxt">${escapeHtml(name)}</span>`;
         brandsEl.appendChild(pill);
       });
@@ -745,14 +735,12 @@
         const t = n.querySelector(".destText");
         if (!t) return;
 
-        // mede overflow
         const over = t.scrollWidth - n.clientWidth;
         if (over > 18){
           n.classList.add("is-marquee");
           n.style.setProperty("--marqMove", `${over}px`);
 
-          // duração proporcional (suave): 40px/s + pausas
-          const pxPerSec = 40;
+          const pxPerSec = 40; // suave
           const seconds = Math.max(8, Math.min(18, over / pxPerSec + 6));
           n.style.setProperty("--marqDur", `${seconds}s`);
         }
@@ -791,16 +779,19 @@
       el.className = "card";
 
       const stripeColor = (card.lineColor || "").trim() || "#0f3f82";
-      const next = fmtHHMM(card.times[0]);
+      const nextMs = card.times[0];
+      const next = fmtHHMM(nextMs);
       const rest = card.times.slice(1);
 
       const nextTimes = clusterTimes(rest);
       const hasNext = nextTimes.length > 0;
 
-      // economiza espaço na vertical
       const portrait = window.matchMedia("(orientation: portrait)").matches;
       const MAX_NEXT = portrait ? 2 : 3;
       const show = nextTimes.slice(0, MAX_NEXT);
+
+      const mins = Math.round((nextMs - Date.now()) / 60000);
+      const isSoon = Number.isFinite(mins) && mins >= 0 && mins <= 10;
 
       const nextSideHtml = hasNext
         ? `<div class="nextSide" aria-label="Próximos horários">
@@ -820,9 +811,12 @@
 
         <div class="timesCol">
           <div class="timeRow">
-            <div class="next">
-              <div class="when">${next}</div>
-              <div class="label">SAÍDA</div>
+            <div class="next ${isSoon ? "is-soon" : ""}">
+              <div>
+                <div class="when">${next}</div>
+                <div class="label">${isSoon ? "SAINDO EM ATÉ 10 MIN" : "PRÓXIMA SAÍDA"}</div>
+              </div>
+              <span class="statusDot" aria-hidden="true"></span>
             </div>
             ${nextSideHtml}
           </div>
@@ -844,7 +838,7 @@
       await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
       const available = Math.max(0, stageEl.clientHeight);
-      const cardH = sample.getBoundingClientRect().height || 86;
+      const cardH = sample.getBoundingClientRect().height || 82;
       const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--stageGap")) || 12;
 
       stageEl.innerHTML = "";
@@ -891,7 +885,6 @@
       setPagerLabel();
       startPaging();
 
-      // aplica marquee na página ativa (depois do layout estabilizar)
       requestAnimationFrame(() => requestAnimationFrame(() => applyMarquee(pages[0])));
     }
 
@@ -914,7 +907,6 @@
       setPagerLabel();
       setProgress(0);
 
-      // marquee na nova página ativa
       requestAnimationFrame(() => requestAnimationFrame(() => applyMarquee(to)));
     }
 
@@ -938,67 +930,7 @@
     }
 
     /*******************************************************************
-     * DEMO
-     *******************************************************************/
-    function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
-    function pick(arr){ return arr[randInt(0, arr.length - 1)]; }
-
-    function buildDemoCards(){
-      const now = Date.now();
-      const end = now + PV_CONFIG.TIME_WINDOW_HOURS * 60 * 60 * 1000;
-
-      const lines = new Set();
-      while (lines.size < PV_CONFIG.DEMO_LINES_COUNT){
-        const base = Math.random() < 0.30 ? randInt(300, 499) : randInt(1, 199);
-        lines.add(String(base));
-      }
-
-      const cards = [];
-      for (const line of lines){
-        const dest = pick(PV_CONFIG.DEMO_HEADSIGN_POOL) + " • " + pick(PV_CONFIG.DEMO_HEADSIGN_POOL);
-        const agency = pick(PV_CONFIG.DEMO_AGENCIES);
-
-        const times = [];
-        let t = now + randInt(2, 18) * 60 * 1000;
-        while (t <= end){
-          times.push(t);
-          t += randInt(6, 36) * 60 * 1000;
-        }
-        times.sort((a,b)=>a-b);
-        if (Math.random() < 0.20) times.splice(1);
-
-        cards.push({
-          line,
-          destination: dest,
-          times,
-          nextTime: times[0],
-          agency: agency.name,
-          lineColor: agency.color
-        });
-      }
-
-      cards.sort((a,b)=>a.nextTime - b.nextTime);
-      return cards;
-    }
-
-    let demoTimer = null;
-    async function startDemoLoop(){
-      subtitleEl.textContent = String(PV_CONFIG.STATION_QUERY || DEFAULT_STATION_FALLBACK).toUpperCase();
-      setStatus(`Próximas saídas (${PV_CONFIG.TIME_WINDOW_HOURS}h) • Modo demo`);
-      warnEl.style.display = "none";
-
-      const render = async () => {
-        currentCards = buildDemoCards();
-        await paginateCards(currentCards);
-      };
-
-      await render();
-      if (demoTimer) clearInterval(demoTimer);
-      demoTimer = setInterval(render, PV_CONFIG.DEMO_REFRESH_SEC * 1000);
-    }
-
-    /*******************************************************************
-     * MAPS
+     * GOOGLE MAPS
      *******************************************************************/
     function loadGoogleMaps(){
       return new Promise((resolve, reject) => {
@@ -1007,7 +939,7 @@
         const key = (GOOGLE_MAPS_API_KEY || "").trim();
         if (!key || key === "COLE_SUA_API_KEY_AQUI"){
           warnEl.style.display = "block";
-          warnEl.textContent = "INSIRA SUA GOOGLE MAPS API KEY (config.js OU CONSTANTE GOOGLE_MAPS_API_KEY).";
+          warnEl.textContent = "INSIRA SUA GOOGLE MAPS API KEY NO config.js (window.PONTOVIEW_GMAPS_KEY).";
           return reject(new Error("Missing API key"));
         }
 
@@ -1106,6 +1038,7 @@
           if (step.travel_mode !== "TRANSIT" || !step.transit) continue;
 
           const td = step.transit;
+
           const lineShort = td.line?.short_name || td.line?.name || "—";
           const headsign = td.headsign || td.line?.name || td.arrival_stop?.name || "Destino";
 
@@ -1115,9 +1048,18 @@
           const agencyName =
             td.line?.agencies?.[0]?.name ||
             td.line?.agencies?.[0]?.short_name ||
-            "";
+            td.line?.name ||
+            td.line?.short_name ||
+            "OPERADORA";
 
-          const lineColor = (td.line?.color || "").trim();
+          let lineColor = (td.line?.color || "").trim();
+          if (!lineColor){
+            // cor determinística por agencyName (para legenda sempre listar "todas")
+            let h = 0;
+            for (let i=0;i<agencyName.length;i++) h = (h*31 + agencyName.charCodeAt(i)) >>> 0;
+            const hue = h % 360;
+            lineColor = `hsl(${hue} 75% 45%)`;
+          }
 
           trips.push({
             line: String(lineShort),
@@ -1230,12 +1172,6 @@
 
     (async function boot(){
       try{
-        if (PV_CONFIG.DEMO_MODE){
-          await startDemoLoop();
-          window.addEventListener("resize", async () => { await paginateCards(currentCards || []); });
-          return;
-        }
-
         setStatus("Carregando Google Maps…");
         await loadGoogleMaps();
         warnEl.style.display = "none";
@@ -1255,7 +1191,9 @@
         await refreshData();
         scheduleRefresh();
 
-        window.addEventListener("resize", async () => { await paginateCards(currentCards || []); });
+        window.addEventListener("resize", async () => {
+          await paginateCards(currentCards || []);
+        });
       }catch(err){
         console.warn(err);
         warnEl.style.display = "block";
@@ -1267,6 +1205,3 @@
   </script>
 </body>
 </html>
-
-
-
