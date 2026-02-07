@@ -7,7 +7,12 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Material Symbols (Google Fonts) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0" />
 
   <style>
     :root{
@@ -20,6 +25,7 @@
       --pad: clamp(14px, 1.8vw, 26px);
       --gap: clamp(12px, 1.4vw, 18px);
 
+      /* menos “branco estourado” */
       --panel:#e7edf5;
       --card: rgba(255,255,255,.78);
       --line: rgba(210,222,238,.95);
@@ -38,6 +44,9 @@
       --pillDark2:#2f3845;
 
       --stageGap: 12px;
+
+      /* cor padrão PontoView para linhas sem cor na API */
+      --pvBlue:#0f3d63;
     }
 
     *{box-sizing:border-box}
@@ -110,7 +119,17 @@
       flex:0 0 auto;
       color:#fff;
     }
-    .pvIconBadge svg{ width:62%; height:62%; opacity:.98; }
+    .pvIconBadge .material-symbols-outlined{
+      font-size: 34px;
+      line-height: 1;
+      color:#fff;
+      font-variation-settings:
+        'FILL' 0,
+        'wght' 600,
+        'GRAD' 0,
+        'opsz' 24;
+      opacity:.98;
+    }
 
     .pvTitles{ display:flex; flex-direction:column; gap:6px; min-width:0; }
     .pvTitle{
@@ -255,7 +274,7 @@
       transition: opacity var(--anim) var(--ease), transform var(--anim) var(--ease);
     }
 
-    /* ===== CARD (padrão landscape) ===== */
+    /* ===== CARD (landscape) ===== */
     .card{
       background: var(--card);
       border: 1px solid var(--line);
@@ -300,7 +319,7 @@
 
     .destCol{ min-width:0; }
 
-    /* ===== DESTINO (marquee + fade só na direita) ===== */
+    /* ===== DESTINO (SEM FADE) + MARQUEE SUAVE ===== */
     .destName{
       position: relative;
       min-width: 0;
@@ -311,9 +330,11 @@
       letter-spacing: .02em;
       text-transform: uppercase;
       color: var(--ink);
-      padding-right: 18px;
-      mask-image: linear-gradient(90deg, #000 0, #000 84%, rgba(0,0,0,.0) 100%);
-      -webkit-mask-image: linear-gradient(90deg, #000 0, #000 84%, rgba(0,0,0,.0) 100%);
+      padding-right: 10px;
+
+      /* removido fade (mask) */
+      mask-image: none;
+      -webkit-mask-image: none;
     }
     .destText{
       display:inline-block;
@@ -461,7 +482,7 @@
       transform-origin:left center;
     }
 
-    /* ===== FOOTER (legenda deve mostrar TODAS) ===== */
+    /* ===== FOOTER (legendas com marquee, logo fixa à direita) ===== */
     .pvFooter{
       flex:0 0 auto;
       height: var(--footerH);
@@ -474,18 +495,20 @@
       min-width:0;
     }
 
-    .brands{
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      justify-content:center;
-      min-width:0;
+    .brandsViewport{
       flex: 1 1 auto;
+      min-width:0;
+      overflow:hidden;
+      position:relative;
+      padding-right: 10px;
+    }
 
-      /* IMPORTANTE: não cortar as demais pills */
-      flex-wrap: wrap;
-      overflow: visible;
-      row-gap: 8px;
+    .brandsTrack{
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      white-space:nowrap;
+      will-change: transform;
     }
 
     .brandPill{
@@ -501,7 +524,6 @@
       letter-spacing:.10em;
       text-transform: uppercase;
       font-size: 10px;
-      white-space:nowrap;
       box-shadow: 0 10px 18px rgba(0,0,0,.14);
       max-width: 100%;
     }
@@ -512,9 +534,9 @@
       flex:0 0 auto;
     }
     .brandTxt{
+      max-width: 44vw;
       overflow:hidden;
       text-overflow:ellipsis;
-      max-width: min(44vw, 420px);
     }
 
     .pvFooterRight{
@@ -531,12 +553,21 @@
       opacity:.92;
     }
 
-    /* ===== AJUSTE PRINCIPAL PEDIDO: em portrait, destino embaixo do número ===== */
-    @media (orientation: portrait){
-      /* dá um pouco mais de altura pro rodapé caber 2 linhas de legenda */
-      .pvFooter{ height: clamp(76px, 9vh, 112px); }
+    /* animação do marquee do rodapé */
+    .brandsViewport.is-marquee .brandsTrack{
+      animation: brandsMarquee var(--brandsDur, 18s) linear infinite;
+    }
+    @keyframes brandsMarquee{
+      0%   { transform: translateX(0); }
+      10%  { transform: translateX(0); }
+      90%  { transform: translateX(calc(-1 * var(--brandsMove, 0px))); }
+      100% { transform: translateX(calc(-1 * var(--brandsMove, 0px))); }
+    }
 
-      /* reorganiza grid do card */
+    /* ===== PORTRAIT: destino embaixo do número da linha ===== */
+    @media (orientation: portrait){
+      .pvFooter{ height: clamp(62px, 8vh, 96px); }
+
       .card{
         grid-template-columns: 120px 1fr;
         grid-template-rows: auto auto;
@@ -551,13 +582,9 @@
       .timesCol{ grid-area: times; }
       .destCol{ grid-area: dest; }
 
-      /* destino ganha mais espaço horizontal agora */
       .destName{
         font-size: clamp(18px, 2.35vw, 30px);
-        padding-right: 22px;
       }
-
-      /* horários ficam mais compactos */
       .timeRow{ max-width: 172px; }
       .nextSide{ width: 70px; }
     }
@@ -578,14 +605,7 @@
       <header class="pvHeader">
         <div class="pvHeaderLeft">
           <div class="pvIconBadge" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M8 6h8a4 4 0 0 1 4 4v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7a4 4 0 0 1 4-4Z"/>
-              <path d="M6 16h12"/>
-              <path d="M7 19l-1 2"/>
-              <path d="M18 19l1 2"/>
-              <path d="M7.5 13h.01"/>
-              <path d="M16.5 13h.01"/>
-            </svg>
+            <span class="material-symbols-outlined">directions_bus</span>
           </div>
 
           <div class="pvTitles">
@@ -620,7 +640,11 @@
       </div>
 
       <footer class="pvFooter">
-        <div class="brands" id="brands"></div>
+        <!-- Legenda com marquee (logo fica fixa à direita) -->
+        <div class="brandsViewport" id="brandsViewport">
+          <div class="brandsTrack" id="brandsTrack"></div>
+        </div>
+
         <div class="pvFooterRight">
           <img class="pvLogo" src="./assets/logo-pontoview.png" alt="PontoView" />
         </div>
@@ -639,7 +663,9 @@
     const titleEl = document.getElementById("pvTitle");
     const subtitleEl = document.getElementById("pvSubtitle");
     const subLeftEl = document.getElementById("pvSubLeft");
-    const brandsEl = document.getElementById("brands");
+
+    const brandsViewport = document.getElementById("brandsViewport");
+    const brandsTrack = document.getElementById("brandsTrack");
 
     titleEl.textContent = panel.dataset.title || "";
     subLeftEl.textContent = panel.dataset.subleft || "";
@@ -670,7 +696,12 @@
       SWEEP_RADIUS_M: 1200,
       REFRESH_EVERY_MS: 30 * 60 * 1000,
       PAST_TOLERANCE_MS: 20_000,
-      CLUSTER_GAP_MIN: 2
+      CLUSTER_GAP_MIN: 2,
+
+      /* footer marquee */
+      FOOTER_MARQUEE_PX_PER_SEC: 55,
+      FOOTER_MARQUEE_MIN_SEC: 12,
+      FOOTER_MARQUEE_MAX_SEC: 26
     };
 
     const GOOGLE_MAPS_API_KEY = (window.PONTOVIEW_GMAPS_KEY || "").trim() || "COLE_SUA_API_KEY_AQUI";
@@ -706,41 +737,8 @@
       return clusters.map(c => c.length === 1 ? fmtHHMM(c[0]) : `${fmtHHMM(c[0])}–${fmtHHMM(c[c.length-1])}`);
     }
 
-    /* ====== LEGENDA NO RODAPÉ (não cortar + listar todos os rótulos) ====== */
-    function renderLegendFromCards(cards){
-      const freq = new Map(); // name -> {color,count}
-      (cards || []).forEach(c => {
-        const name = (c.agency || "").trim();
-        if (!name) return;
-        const color = (c.lineColor || "").trim() || "#2c6aa3";
-        const cur = freq.get(name) || { color, count: 0 };
-        cur.count += 1;
-        if (cur.color === "#2c6aa3" && color) cur.color = color;
-        freq.set(name, cur);
-      });
-
-      const entries = Array.from(freq.entries())
-        .sort((a,b)=> (b[1].count - a[1].count) || a[0].localeCompare(b[0]));
-
-      brandsEl.innerHTML = "";
-      if (!entries.length){
-        brandsEl.style.display = "none";
-        return;
-      }
-      brandsEl.style.display = "flex";
-
-      entries.forEach(([name, info]) => {
-        const pill = document.createElement("div");
-        pill.className = "brandPill";
-        pill.style.setProperty("--c", info.color);
-        pill.title = name;
-        pill.innerHTML = `<span class="brandDot"></span><span class="brandTxt">${escapeHtml(name)}</span>`;
-        brandsEl.appendChild(pill);
-      });
-    }
-
-    /* ====== MARQUEE (só quando overflow) ====== */
-    function applyMarquee(root = document){
+    /* ====== MARQUEE DESTINO (apenas se overflow) ====== */
+    function applyDestMarquee(root = document){
       const nodes = root.querySelectorAll(".destName");
       nodes.forEach(n => {
         n.classList.remove("is-marquee");
@@ -759,6 +757,71 @@
           n.style.setProperty("--marqDur", `${seconds}s`);
         }
       });
+    }
+
+    /* ====== RODAPÉ: renderiza todas as empresas/operadoras e aplica marquee se não couber ====== */
+    function applyFooterMarquee(){
+      brandsViewport.classList.remove("is-marquee");
+      brandsViewport.style.removeProperty("--brandsMove");
+      brandsViewport.style.removeProperty("--brandsDur");
+
+      // se não tem nada, sai
+      if (!brandsTrack.children.length) return;
+
+      // mede overflow
+      const over = brandsTrack.scrollWidth - brandsViewport.clientWidth;
+      if (over > 10){
+        brandsViewport.classList.add("is-marquee");
+        brandsViewport.style.setProperty("--brandsMove", `${over}px`);
+
+        const pxPerSec = PV_CONFIG.FOOTER_MARQUEE_PX_PER_SEC;
+        const seconds = Math.max(
+          PV_CONFIG.FOOTER_MARQUEE_MIN_SEC,
+          Math.min(PV_CONFIG.FOOTER_MARQUEE_MAX_SEC, over / pxPerSec + 8)
+        );
+        brandsViewport.style.setProperty("--brandsDur", `${seconds}s`);
+      }
+    }
+
+    function renderLegendFromCards(cards){
+      // Quero “todas as empresas que operam as linhas presentes”.
+      // Se a API não devolver agency, agrupamos por "LINHA X" para não colapsar.
+      const map = new Map(); // name -> {color, count}
+
+      (cards || []).forEach(c => {
+        const name = (c.agency || "").trim();
+        if (!name) return;
+
+        const color = (c.lineColor || "").trim() || getComputedStyle(document.documentElement).getPropertyValue("--pvBlue").trim() || "#0f3d63";
+
+        const cur = map.get(name) || { color, count: 0 };
+        cur.count += 1;
+        // mantém primeira cor que aparecer
+        if (!cur.color && color) cur.color = color;
+        map.set(name, cur);
+      });
+
+      const entries = Array.from(map.entries())
+        .sort((a,b)=> (b[1].count - a[1].count) || a[0].localeCompare(b[0]));
+
+      brandsTrack.innerHTML = "";
+      if (!entries.length){
+        brandsTrack.innerHTML = "";
+        applyFooterMarquee();
+        return;
+      }
+
+      entries.forEach(([name, info]) => {
+        const pill = document.createElement("div");
+        pill.className = "brandPill";
+        pill.style.setProperty("--c", info.color || "#0f3d63");
+        pill.title = name;
+        pill.innerHTML = `<span class="brandDot"></span><span class="brandTxt">${escapeHtml(name)}</span>`;
+        brandsTrack.appendChild(pill);
+      });
+
+      // aplica marquee caso não caiba
+      requestAnimationFrame(() => requestAnimationFrame(applyFooterMarquee));
     }
 
     let currentCards = [];
@@ -791,7 +854,7 @@
       const el = document.createElement("div");
       el.className = "card";
 
-      const stripeColor = (card.lineColor || "").trim() || "#0f3d63";
+      const stripeColor = (card.lineColor || "").trim() || "#0f3d63"; // fallback azul PontoView
       const nextMs = card.times[0];
       const next = fmtHHMM(nextMs);
       const rest = card.times.slice(1);
@@ -869,6 +932,7 @@
       pages = [];
       pageIndex = 0;
 
+      // legenda do rodapé com marquee se necessário
       renderLegendFromCards(cards);
 
       if (!cards.length){
@@ -897,7 +961,7 @@
       setPagerLabel();
       startPaging();
 
-      requestAnimationFrame(() => requestAnimationFrame(() => applyMarquee(pages[0])));
+      requestAnimationFrame(() => requestAnimationFrame(() => applyDestMarquee(pages[0])));
     }
 
     function showPage(nextIndex){
@@ -919,7 +983,7 @@
       setPagerLabel();
       setProgress(0);
 
-      requestAnimationFrame(() => requestAnimationFrame(() => applyMarquee(to)));
+      requestAnimationFrame(() => requestAnimationFrame(() => applyDestMarquee(to)));
     }
 
     function startPaging(){
@@ -1057,25 +1121,19 @@
           const depMs = toMillis(td.departure_time) || toMillis(td.departure_time?.value);
           if (!depMs) continue;
 
-          /* Se agência não vier (muito comum), usamos um rótulo útil para a legenda.
-             Isso faz aparecer “várias” entradas no rodapé mesmo quando o GTFS não entrega agencies. */
           const agencyFromApi =
             td.line?.agencies?.[0]?.name ||
             td.line?.agencies?.[0]?.short_name ||
             "";
 
+          // “empresas que operam as linhas”: se não vier, vira um rótulo estável por linha (não inventa empresa)
           const agencyLabel = agencyFromApi.trim()
             ? agencyFromApi.trim()
             : `LINHA ${String(lineShort).trim() || "—"}`;
 
+          // cor da linha: se a API não informar, mantém azul PontoView
           let lineColor = (td.line?.color || "").trim();
-          if (!lineColor){
-            // cor determinística por rótulo (para legenda sempre ter cores distintas)
-            let h = 0;
-            for (let i=0;i<agencyLabel.length;i++) h = (h*31 + agencyLabel.charCodeAt(i)) >>> 0;
-            const hue = h % 360;
-            lineColor = `hsl(${hue} 75% 45%)`;
-          }
+          if (!lineColor) lineColor = "#0f3d63";
 
           trips.push({
             line: String(lineShort),
@@ -1209,6 +1267,7 @@
 
         window.addEventListener("resize", async () => {
           await paginateCards(currentCards || []);
+          requestAnimationFrame(() => requestAnimationFrame(applyFooterMarquee));
         });
       }catch(err){
         console.warn(err);
@@ -1221,4 +1280,3 @@
   </script>
 </body>
 </html>
-
