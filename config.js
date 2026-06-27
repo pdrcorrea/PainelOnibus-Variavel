@@ -1,1 +1,1 @@
-window.PONTOVIEW_GMAPS_KEY = "AIzaSyBLw4i2wnVkaw8capkfdqsyocbzO66erBA";
+window.PONTOVIEW_GMAPS_KEY = "AIzaSyD8SYJeVvu_QbsCjApU8vxBkwMAHiQTmFA";
