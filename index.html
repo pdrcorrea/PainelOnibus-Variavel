@@ -292,29 +292,33 @@
       min-height: 82px;
     }
 
-    .stripe{
-      position:absolute;
-      inset:0 auto 0 0;
-      width: 10px;
-      border-radius: 999px;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.35);
-    }
-
     .lineCol{
       display:flex;
       flex-direction:column;
       gap: 2px;
       align-items:flex-start;
-      padding-left: 10px;
       min-width:0;
     }
     .lineNum{
-      font-size: clamp(26px, 2.4vw, 38px);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width: 64px;
+      max-width:100%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      background: var(--lineBadgeColor, var(--pvBlue));
+      color: var(--lineBadgeText, #fff);
+      border: 1px solid rgba(255,255,255,.45);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.25),
+        0 7px 16px rgba(2,10,23,.13);
+      font-size: clamp(24px, 2.25vw, 36px);
       font-weight: 900;
       letter-spacing: .02em;
       line-height: 1;
-      color: var(--ink);
       font-variant-numeric: tabular-nums;
+      white-space:nowrap;
     }
 
     .destCol{ min-width:0; }
@@ -854,7 +858,11 @@
       const el = document.createElement("div");
       el.className = "card";
 
-      const stripeColor = (card.lineColor || "").trim() || "#0f3d63"; // fallback azul PontoView
+      const rawLineColor = (card.lineColor || "").trim();
+      const lineBadgeColor = /^#[0-9a-f]{6}$/i.test(rawLineColor) ? rawLineColor : "#0f3d63";
+      const rgb = lineBadgeColor.slice(1).match(/.{2}/g).map(v => parseInt(v, 16));
+      const luminance = (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
+      const lineBadgeText = luminance > 0.68 ? "#0b1626" : "#ffffff";
       const nextMs = card.times[0];
       const next = fmtHHMM(nextMs);
       const rest = card.times.slice(1);
@@ -877,7 +885,7 @@
 
       el.innerHTML = `
         <div class="lineCol">
-          <div class="lineNum">${escapeHtml(card.line)}</div>
+          <div class="lineNum" style="--lineBadgeColor:${lineBadgeColor};--lineBadgeText:${lineBadgeText}">${escapeHtml(card.line)}</div>
         </div>
 
         <div class="destCol">
@@ -897,11 +905,6 @@
           </div>
         </div>
       `;
-
-      const stripe = document.createElement("div");
-      stripe.className = "stripe";
-      stripe.style.background = stripeColor;
-      el.prepend(stripe);
 
       return el;
     }
