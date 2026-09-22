@@ -1,0 +1,9 @@
+name = "pontoview-bus-api"
+main = "src/index.js"
+compatibility_date = "2026-09-19"
+
+[vars]
+DEFAULT_STATION = "Av. Ângelo Giuberti, 291 - Esplanada, Colatina - ES, 29702-060"
+
+[secrets]
+required = [ "GOOGLE_MAPS_API_KEY" ]
