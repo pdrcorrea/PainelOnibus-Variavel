@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Configurar localidade • BusBoard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+<style>
+*{box-sizing:border-box}html,body{min-height:100%;margin:0}body{font-family:Inter,system-ui,sans-serif;background:linear-gradient(145deg,#e9f1f9,#f8fafc);color:#15283f;display:grid;place-items:center;padding:24px}
+main{width:min(100%,460px);background:#fff;border:1px solid #dce6f0;border-radius:26px;padding:clamp(24px,5vw,36px);box-shadow:0 20px 60px rgba(16,43,73,.1)}
+.brand{display:flex;align-items:center;gap:13px;margin-bottom:28px}.brand img{width:52px;height:52px;object-fit:contain}.brand span{font-weight:900;font-size:22px;letter-spacing:-.04em}
+h1{font-size:clamp(25px,5vw,32px);letter-spacing:-.045em;margin:0 0 9px}p{line-height:1.6;color:#5d6d82;margin:0 0 28px;font-size:14px}
+label{display:block;font-size:13px;font-weight:800;margin-bottom:10px}input{width:100%;height:56px;border:1.5px solid #cbd7e5;border-radius:14px;padding:0 16px;font:600 16px Inter,system-ui,sans-serif;color:#15283f;background:#f8fbfe;outline:none}input:focus{border-color:#277cb7;box-shadow:0 0 0 3px rgba(39,124,183,.12)}input::placeholder{color:#8a99aa;font-weight:400}
+button{border:0;cursor:pointer;font-family:inherit;font-weight:800;border-radius:14px;min-height:52px;padding:0 15px}button.primary{width:100%;background:#0f3d63;color:#fff;margin-top:15px;font-size:15px}button.primary:hover{background:#185681}
+.secondary{background:#edf3f9;color:#0f3d63;width:100%;margin-top:10px}.secondary:hover{background:#e0edf8}
+#feedback{font-size:13px;line-height:1.5;min-height:0;margin:12px 0 0;color:#315675}#feedback:empty{display:none}.help{font-size:12px;color:#738397;margin-top:22px;line-height:1.5}
+</style>
+</head>
+<body>
+<main>
+<div class="brand"><img src="./assets/icon.png" alt=""><span>BusBoard</span></div>
+<h1>Onde vamos exibir?</h1>
+<p>Informe a cidade, bairro ou endereço do ponto de referência para buscar os próximos ônibus.</p>
+<form id="setup"><label for="station">Localização</label><input id="station" name="station" type="text" autocomplete="street-address" maxlength="240" required placeholder="Ex.: Centro, Colatina - ES">
+<button class="primary" type="submit">Abrir painel →</button></form>
+<button class="secondary" type="button" id="copy">Copiar link para a TV</button>
+<div id="feedback" role="status" aria-live="polite"></div>
+<div class="help">O link salvo abre diretamente o painel. Para mudar de localidade, volte a esta página.</div>
+</main>
+<script>
+const input=document.getElementById('station'),feedback=document.getElementById('feedback');
+const saved=localStorage.getItem('busboard:last-station');if(saved)input.value=saved;
+function panelUrl(){const value=input.value.trim();if(!value){input.focus();feedback.textContent='Informe uma localização para continuar.';return null;}const u=new URL('./index.html',location.href);u.searchParams.set('station',value);return u.href;}
+document.getElementById('setup').addEventListener('submit',e=>{e.preventDefault();const url=panelUrl();if(url){localStorage.setItem('busboard:last-station',input.value.trim());location.assign(url);}});
+document.getElementById('copy').addEventListener('click',async()=>{const url=panelUrl();if(!url)return;try{await navigator.clipboard.writeText(url);localStorage.setItem('busboard:last-station',input.value.trim());feedback.textContent='Link copiado! Abra-o na TV para acessar diretamente esta localidade.';}catch{feedback.textContent='Não foi possível copiar automaticamente. Link: '+url;}});
+</script>
+</body></html>
