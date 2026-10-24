@@ -392,6 +392,7 @@
     .timeRow{
       width: 100%;
       max-width: 168px;
+      height: 66px;
       display:flex;
       align-items: stretch;
       gap: 8px;
@@ -452,7 +453,9 @@
       border-radius: 14px;
       border: 1px solid rgba(15,61,99,.12);
       background: rgba(255,255,255,.82);
-      padding: 4px 10px;
+      padding: 2px 7px;
+      height: 100%;
+      min-height: 0;
       display:flex;
       flex-direction: column;
       justify-content: center;
@@ -463,10 +466,15 @@
     .nextSideItem{
       width: 100%;
       text-align:center;
-      font-size: clamp(14px, 1.2vw, 18px);
+      font-size: clamp(12px, 1.05vw, 15px);
       font-weight: 900;
-      letter-spacing: .06em;
-      padding: 7px 0;
+      letter-spacing: .02em;
+      flex: 1 1 0;
+      min-height: 0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 0;
       border: 0;
       border-bottom: 1px solid rgba(210,222,238,.95);
       background: transparent;
@@ -918,7 +926,7 @@
       const hasNext = nextTimes.length > 0;
 
       const portrait = window.matchMedia("(orientation: portrait)").matches;
-      const MAX_NEXT = portrait ? 2 : 3;
+      const MAX_NEXT = 3;
       const show = nextTimes.slice(0, MAX_NEXT);
 
       const mins = Math.round((nextMs - Date.now()) / 60000);
