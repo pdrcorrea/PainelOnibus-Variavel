@@ -1308,8 +1308,17 @@
       currentCards = cards;
       await paginateCards(cards);
 
-      if (!okCount) setStatus("Sem resposta da API (verifique a KEY e restrições).");
-      else setStatus(`Próximas saídas (${PV_CONFIG.TIME_WINDOW_HOURS}h) • Linhas: ${cards.length}`);
+      if (!okCount || !cards.length) {
+        const reason = !okCount
+          ? "Não foi possível consultar as rotas de transporte nesta localização."
+          : "Nenhuma partida foi encontrada nas proximidades deste ponto nas próximas 2 horas.";
+        warnEl.style.display = "block";
+        warnEl.innerHTML = `${reason} <a href="./configurar.html" style="color:inherit;text-decoration:underline">Alterar localização</a>`;
+        setStatus("Localização sem partidas disponíveis");
+      } else {
+        warnEl.style.display = "none";
+        setStatus(`Próximas saídas (${PV_CONFIG.TIME_WINDOW_HOURS}h) • Linhas: ${cards.length}`);
+      }
     }
 
     function scheduleRefresh(){
@@ -1345,7 +1354,8 @@
       }catch(err){
         console.warn(err);
         warnEl.style.display = "block";
-        warnEl.textContent = "ERRO AO INICIAR: " + (err?.message || String(err));
+        warnEl.innerHTML = "Não foi possível carregar esta localização. <a href=\"./configurar.html\" style=\"color:inherit;text-decoration:underline\">Tentar outro endereço</a>";
+        console.error("Falha ao iniciar o painel:", err);
         subtitleEl.textContent = DEFAULT_STATION_FALLBACK.toUpperCase();
         setStatus("Aguardando configuração…");
       }
