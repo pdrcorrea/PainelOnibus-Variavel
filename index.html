@@ -4,6 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PontoView • Ônibus</title>
+  <script>
+    // Acesso sem localidade: abrir a configuração antes de consultar a API.
+    if (!new URLSearchParams(location.search).get('station')?.trim()) {
+      location.replace(new URL('./configurar.html', location.href).href);
+    }
+  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
