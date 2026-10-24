@@ -119,6 +119,12 @@
       flex:0 0 auto;
       color:#fff;
     }
+    .pvIconBadge .pvBrandIcon{
+      width: 86%;
+      height: 86%;
+      object-fit: contain;
+      display: block;
+    }
     .pvIconBadge .material-symbols-outlined{
       font-size: 34px;
       line-height: 1;
@@ -158,12 +164,14 @@
     }
     .pvClock{
       user-select:none;
-      font-size: clamp(12px, 1.1vw, 16px);
+      font-size: clamp(38px, 5vw, 82px);
       font-weight: 900;
-      letter-spacing:.10em;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      letter-spacing:-.035em;
       text-transform: uppercase;
       color:#fff;
-      padding: clamp(10px, 1.1vw, 14px) clamp(14px, 1.5vw, 22px);
+      padding: clamp(5px, .7vw, 10px) clamp(12px, 1.3vw, 20px);
       border-radius: 999px;
       background: rgba(255,255,255,.16);
       border: 1px solid rgba(255,255,255,.22);
@@ -658,7 +666,7 @@
       <header class="pvHeader">
         <div class="pvHeaderLeft">
           <div class="pvIconBadge" aria-hidden="true">
-            <span class="material-symbols-outlined">directions_bus</span>
+            <img class="pvBrandIcon" src="./assets/icon.png" alt="" />
           </div>
 
           <div class="pvTitles">
