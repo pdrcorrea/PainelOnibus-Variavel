@@ -20,12 +20,12 @@ button{border:0;cursor:pointer;font-family:inherit;font-weight:800;border-radius
 <main>
 <div class="brand"><img src="./assets/icon.png" alt=""><span>BusBoard</span></div>
 <h1>Onde vamos exibir?</h1>
-<p>Informe a cidade, bairro ou endereço do ponto de referência para buscar os próximos ônibus.</p>
-<form id="setup"><label for="station">Localização</label><input id="station" name="station" type="text" autocomplete="street-address" maxlength="240" required placeholder="Ex.: Centro, Colatina - ES">
+<p>Informe um endereço próximo ao ponto de ônibus ou terminal. Apenas o nome da cidade pode não encontrar linhas.</p>
+<form id="setup"><label for="station">Localização</label><input id="station" name="station" type="text" autocomplete="street-address" maxlength="240" required placeholder="Ex.: Av. Ângelo Giuberti, 291, Colatina - ES">
 <button class="primary" type="submit">Abrir painel →</button></form>
 <button class="secondary" type="button" id="copy">Copiar link para a TV</button>
 <div id="feedback" role="status" aria-live="polite"></div>
-<div class="help">O link salvo abre diretamente o painel. Para mudar de localidade, volte a esta página.</div>
+<div class="help">Use preferencialmente o endereço de um terminal ou ponto atendido por ônibus. O link copiado abre diretamente o painel nessa localização.</div>
 </main>
 <script>
 const input=document.getElementById('station'),feedback=document.getElementById('feedback');
