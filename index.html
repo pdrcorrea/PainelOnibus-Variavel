@@ -4,14 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PontoView • Ônibus</title>
-  <script>
-    // Acesso sem localidade: abrir a configuração antes de consultar a API.
-    const stationParam = new URLSearchParams(location.search).get('station')?.trim();
-    const storedStation = localStorage.getItem('busboard:last-station')?.trim();
-    if (!stationParam && !storedStation) {
-      location.replace(new URL('./configurar.html', location.href).href);
-    }
-  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -752,7 +744,7 @@
     const Q = getQuery();
 
     const PV_CONFIG = {
-      STATION_QUERY: Q.station || localStorage.getItem('busboard:last-station')?.trim() || "Av. Ângelo Giuberti, 291 - Esplanada, Colatina - ES, 29702-060",
+      STATION_QUERY: Q.station || "Av. Ângelo Giuberti, 291 - Esplanada, Colatina - ES, 29702-060",
       TIME_WINDOW_HOURS: 2,
       SWEEP_POINTS: 12,
       SWEEP_RADIUS_M: 1200,
