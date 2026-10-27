@@ -321,8 +321,8 @@
       align-items:center;
       justify-content:center;
       flex:0 0 auto;
-      font-size: clamp(22px, 1.9vw, 30px);
-      color:var(--pvBlue);
+      font-size: clamp(20px, 1.6vw, 26px);
+      color:#315777;
       line-height:1;
     }
     .vehicleTypeIcon.material-symbols-outlined{
@@ -444,21 +444,9 @@
       color: rgba(52,66,87,.92);
       white-space:nowrap;
     }
-    .next .statusDot{
-      width:10px;
-      height:10px;
-      border-radius:999px;
-      background: rgba(59,130,246,.92);
-      box-shadow: 0 0 0 3px rgba(59,130,246,.16);
-      flex:0 0 auto;
-    }
     .next.is-soon{
       background: rgba(31,167,101,.10);
       border-color: rgba(31,167,101,.22);
-    }
-    .next.is-soon .statusDot{
-      background: rgba(31,167,101,.95);
-      box-shadow: 0 0 0 3px rgba(31,167,101,.16);
     }
 
     .nextSide{
@@ -987,7 +975,6 @@
             style="--lineBadgeColor:${lineBadgeColor};--lineBadgeText:${lineBadgeText}"
             title="${escapeHtml(lineText)}"
           >${escapeHtml(lineText)}</div>
-          ${vehicleHtml}
         </div>
 
         <div class="destCol">
@@ -1001,7 +988,7 @@
                 <div class="when">${next}</div>
                 <div class="label">${isSoon ? "SAINDO EM ATÉ 10 MIN" : "PRÓXIMA SAÍDA"}</div>
               </div>
-              <span class="statusDot" aria-hidden="true"></span>
+              ${vehicleHtml}
             </div>
             ${nextSideHtml}
           </div>
