@@ -596,6 +596,12 @@
       flex:0 0 auto;
       max-width:none;
     }
+    .brandDots{
+      display:inline-flex;
+      align-items:center;
+      gap:5px;
+      flex:0 0 auto;
+    }
     .brandDot{
       width:12px;
       height:12px;
@@ -847,44 +853,50 @@
 
     function renderLegendFromCards(cards){
       const map = new Map();
-
+      const fallback = '#0f3d63';
       (cards || []).forEach(c => {
-        const name = (c.agency || "").trim();
+        const name = (c.agency || '').trim();
         if (!name) return;
-
-        const color =
-          (c.lineColor || "").trim() ||
-          getComputedStyle(document.documentElement).getPropertyValue("--pvBlue").trim() ||
-          "#0f3d63";
-
-        if (!map.has(name)) map.set(name, { color });
+        // Use the same color validation as the line number badges.
+        const rawColor = (c.lineColor || '').trim();
+        const color = /^#[0-9a-f]{6}$/i.test(rawColor) ? rawColor.toUpperCase() : fallback.toUpperCase();
+        if (!map.has(name)) map.set(name, new Set());
+        map.get(name).add(color);
       });
 
       const entries = Array.from(map.entries())
         .sort((a,b) => a[0].localeCompare(b[0]));
-
-      brandsTrack.innerHTML = "";
+      brandsTrack.innerHTML = '';
       if (!entries.length) return;
 
-      const set = document.createElement("div");
-      set.className = "brandSet";
-
-      entries.forEach(([name, info]) => {
-        const pill = document.createElement("div");
-        pill.className = "brandPill";
-        pill.style.setProperty("--c", info.color || "#0f3d63");
+      const set = document.createElement('div');
+      set.className = 'brandSet';
+      entries.forEach(([name, colors]) => {
+        const pill = document.createElement('div');
+        pill.className = 'brandPill';
         pill.title = name;
-        pill.innerHTML = `<span class="brandDot"></span><span class="brandTxt">${escapeHtml(name)}</span>`;
+        const dots = document.createElement('span');
+        dots.className = 'brandDots';
+        dots.setAttribute('aria-hidden', 'true');
+        for (const color of colors){
+          const dot = document.createElement('span');
+          dot.className = 'brandDot';
+          dot.style.setProperty('--c', color);
+          dots.appendChild(dot);
+        }
+        const label = document.createElement('span');
+        label.className = 'brandTxt';
+        label.textContent = name;
+        pill.append(dots, label);
         set.appendChild(pill);
       });
-
       brandsTrack.appendChild(set);
 
       requestAnimationFrame(() => requestAnimationFrame(() => {
         const needsLoop = set.scrollWidth > brandsViewport.clientWidth + 8;
         if (needsLoop){
           const clone = set.cloneNode(true);
-          clone.setAttribute("aria-hidden", "true");
+          clone.setAttribute('aria-hidden', 'true');
           brandsTrack.appendChild(clone);
         }
         applyFooterMarquee();
