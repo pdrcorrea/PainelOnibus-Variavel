@@ -316,6 +316,19 @@
       justify-content:flex-start;
       min-width:0;
     }
+    .vehicleTypeIcon{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      flex:0 0 auto;
+      font-size: clamp(22px, 1.9vw, 30px);
+      color:var(--pvBlue);
+      line-height:1;
+    }
+    .vehicleTypeIcon.material-symbols-outlined{
+      font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24;
+    }
+
     .lineNum{
       display:inline-flex;
       align-items:center;
@@ -904,6 +917,20 @@
       barFillEl.style.width = pct + "%";
     }
 
+    // Exibe apenas modalidades identificadas na resposta do Google Maps.
+    function vehiclePresentation(type){
+      const types = {
+        BUS:["directions_bus","Ônibus"], INTERCITY_BUS:["directions_bus","Ônibus intermunicipal"],
+        TROLLEYBUS:["directions_bus","Trólebus"], SHARE_TAXI:["airport_shuttle","Transporte compartilhado"],
+        SUBWAY:["subway","Metrô"], METRO_RAIL:["tram","Trem leve / VLT"], TRAM:["tram","Bonde / VLT"],
+        LIGHT_RAIL:["tram","VLT"], COMMUTER_TRAIN:["train","Trem metropolitano"],
+        RAIL:["train","Trem"], HEAVY_RAIL:["train","Trem"], HIGH_SPEED_TRAIN:["train","Trem de alta velocidade"],
+        MONORAIL:["train","Monotrilho"], FERRY:["directions_boat","Balsa"],
+        CABLE_CAR:["cable","Transporte por cabo"], FUNICULAR:["tram","Funicular"], GONDOLA_LIFT:["gondola_lift","Teleférico"]
+      };
+      return types[type] || null;
+    }
+
     function buildCardEl(card){
       const el = document.createElement("div");
       el.className = "card";
@@ -915,6 +942,8 @@
       const lineBadgeText = luminance > 0.68 ? "#0b1626" : "#ffffff";
 
       const lineText = String(card.line || "—").trim();
+      const vehicle = vehiclePresentation(card.vehicleType);
+      const vehicleHtml = vehicle ? `<span class="material-symbols-outlined vehicleTypeIcon" aria-label="${escapeHtml(vehicle[1])}" title="${escapeHtml(vehicle[1])}">${vehicle[0]}</span>` : "";
       const lineClass =
         lineText.length >= 8 ? "is-xlong" :
         lineText.length >= 6 ? "is-long" : "";
@@ -946,6 +975,7 @@
             style="--lineBadgeColor:${lineBadgeColor};--lineBadgeText:${lineBadgeText}"
             title="${escapeHtml(lineText)}"
           >${escapeHtml(lineText)}</div>
+          ${vehicleHtml}
         </div>
 
         <div class="destCol">
@@ -1188,7 +1218,9 @@
           const depMs = toMillis(td.departure_time) || toMillis(td.departure_time?.value);
           if (!depMs) continue;
 
-          const agencyFromApi =
+          const vehicleType = String(td.line?.vehicle?.type || "").toUpperCase();
+
+      const agencyFromApi =
             td.line?.agencies?.[0]?.name ||
             td.line?.agencies?.[0]?.short_name ||
             "";
@@ -1208,7 +1240,8 @@
             timeMs: depMs,
             agency: agencyLabel,
             lineColor,
-            key: `${String(lineShort)}|${String(headsign)}|${depMs}|${agencyLabel}|${String(lineColor||"")}`
+            vehicleType,
+            key: `${String(lineShort)}|${String(headsign)}|${depMs}|${agencyLabel}|${String(lineColor||"")}|${vehicleType}`
           });
         }
       }
@@ -1228,14 +1261,15 @@
         if (t.timeMs < now - PV_CONFIG.PAST_TOLERANCE_MS) continue;
         if (t.timeMs > end) continue;
 
-        const gKey = `${t.line}||${t.destination}||${t.agency||""}||${t.lineColor||""}`;
+        const gKey = `${t.line}||${t.destination}||${t.agency||""}||${t.lineColor||""}||${t.vehicleType||""}`;
         if (!groups.has(gKey)){
           groups.set(gKey, {
             line: t.line,
             destination: t.destination,
             times: [],
             agency: t.agency || "",
-            lineColor: t.lineColor || ""
+            lineColor: t.lineColor || "",
+            vehicleType: t.vehicleType || ""
           });
         }
         groups.get(gKey).times.push(t.timeMs);
@@ -1252,7 +1286,8 @@
           times: g.times,
           nextTime: g.times[0],
           agency: g.agency,
-          lineColor: g.lineColor
+          lineColor: g.lineColor,
+          vehicleType: g.vehicleType
         });
       }
 
