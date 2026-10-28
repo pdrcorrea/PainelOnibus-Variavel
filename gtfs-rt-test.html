@@ -10,4 +10,92 @@ function render(){const route=$('route').value.toLowerCase(),stop=$('stop').valu
 function decode(bytes,origin){const feed=Msg.decode(new Uint8Array(bytes));const entries=[];let trips=0,late=0,vehicles=0;for(const entity of feed.entity||[]){const update=entity.tripUpdate;if(!update){if(entity.vehicle){vehicles++;const vp=entity.vehicle;entries.push({route:vp.trip?.routeId||'',trip:vp.trip?.tripId||'',stop:'GPS',start:vp.vehicle?.label||vp.vehicle?.id||'',arr:null,dep:null})}continue}trips++;for(const st of update.stopTimeUpdate||[]){const arr=st.arrival?.delay,dep=st.departure?.delay;if((dep??arr)>60)late++;entries.push({route:update.trip?.routeId||'',trip:update.trip?.tripId||'',stop:st.stopId||String(st.stopSequence||''),start:(update.trip?.startDate||'')+' '+(update.trip?.startTime||''),arr,dep})}}records=entries;$('trips').textContent=trips||vehicles;$('stops').textContent=entries.length;$('late').textContent=late;const ts=Number(feed.header?.timestamp||0);$('stamp').textContent=ts?new Date(ts*1000).toLocaleTimeString('pt-BR',{timeZone:'America/Sao_Paulo'}):'—';render();notice('Feed decodificado: '+origin+' • '+trips+' viagens com atualizações, '+vehicles+' veículos em posição. Posições GPS NÃO são previsão de saída.');}
 async function load(){if(pending)return;const url=$('url').value.trim();if(!url.startsWith('https://')){notice('Informe URL HTTPS completa. HTTP é bloqueado em páginas HTTPS.',true);return}pending=true;$('run').disabled=true;notice('Consultando GTFS-RT…');const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),15000);try{const res=await fetch(url,{signal:controller.signal,cache:'no-store'});if(!res.ok)throw Error('HTTP '+res.status);decode(await res.arrayBuffer(),'API')}catch(e){notice('Consulta não confirmada: '+e.message+'. Verifique CORS, autorização e disponibilidade do provedor.',true)}finally{clearTimeout(timeout);pending=false;$('run').disabled=false}}
 $('preset').onchange=()=>{const kind=$('preset').value;if(kind==='rio'){$('url').value='https://dados.mobilidade.rio/gtfs/realtime/onibus/vehicle-positions';notice('Feed do Rio selecionado. Clique em Consultar feed para testar acesso via HTTPS e CORS.');}else if(kind==='bh'){$('url').value='http://realtime4.mobilibus.com/web/4ch6j/trip-updates?accesskey=982a57efd77a9462bf1665696fb25984';notice('BH oferece TripUpdates, mas este endpoint é HTTP. Navegadores HTTPS bloqueiam a consulta direta.',true)}else{$('url').value='';notice('Informe a URL do feed HTTPS.')}};$('run').onclick=load;$('file').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{decode(await file.arrayBuffer(),file.name)}catch(err){notice('Arquivo incompatível: '+err.message,true)}};for(const id of ['route','stop','limit'])$(id).addEventListener('input',render);$('interval').onchange=()=>{clearInterval(timer);const ms=Number($('interval').value);if(ms)timer=setInterval(()=>{if(!document.hidden)load()},ms)};
+</script><script>
+(() => {
+  const button = document.getElementById("hrtRun");
+  const status = document.getElementById("hrtStatus");
+  const tbody = document.getElementById("hrtRows");
+  const label = (id, value) => document.getElementById(id).textContent = value;
+  const value = (obj, camel, snake) => obj?.[camel] ?? obj?.[snake];
+  const endpoint = "https://gtfs.gohrt.com/gtfs-rt/TripUpdates.json";
+  const show = (message, error = false) => {
+    status.textContent = message;
+    status.style.background = error ? "#ffe9e7" : "#eaf2fb";
+  };
+  const fmt = time => new Date(time * 1000).toLocaleTimeString("pt-BR", {
+    timeZone: "America/New_York", hour: "2-digit", minute: "2-digit"
+  });
+  button.addEventListener("click", async () => {
+    button.disabled = true;
+    show("Consultando diretamente o feed JSON da HRT...");
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 15000);
+    try {
+      const response = await fetch(endpoint, {signal: controller.signal, cache: "no-store"});
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      const raw = await response.json();
+      const feed = raw?.data?.entity ? raw.data : raw;
+      const entities = feed?.entity ?? feed?.entities;
+      if (!Array.isArray(entities)) throw new Error("Resposta JSON não possui lista GTFS-RT de entidades");
+      const stamp = Number(feed?.header?.timestamp || 0);
+      const age = stamp > 1000000000 ? Math.round((Date.now() / 1000 - stamp) / 60) : null;
+      const stale = age !== null && (age > 10 || age < -5);
+      const rows = [];
+      let trips = 0, delayed = 0;
+      for (const entity of entities) {
+        const tu = value(entity, "tripUpdate", "trip_update");
+        if (!tu) continue;
+        trips++;
+        const trip = tu.trip || {};
+        const stops = value(tu, "stopTimeUpdate", "stop_time_update") || [];
+        for (const stop of stops) {
+          const departure = stop.departure || stop.arrival;
+          const time = Number(departure?.time || 0);
+          if (!Number.isFinite(time) || time < 1000000000) continue;
+          const d = departure?.delay == null ? null : Number(departure.delay);
+          if (d !== null && d > 60) delayed++;
+          rows.push({
+            route: String(value(trip, "routeId", "route_id") || "—"),
+            trip: String(value(trip, "tripId", "trip_id") || "—"),
+            stop: String(value(stop, "stopId", "stop_id") || "—"),
+            time, delay: d
+          });
+        }
+      }
+      label("hrtTrips", trips);
+      label("hrtEvents", rows.length);
+      label("hrtDelay", delayed);
+      label("hrtAge", age === null ? "N/D" : age + " min");
+      rows.sort((a, b) => a.time - b.time);
+      const now = Date.now() / 1000;
+      const upcoming = rows.filter(r => r.time >= now - 120 && r.time <= now + 21600).slice(0, 40);
+      tbody.replaceChildren();
+      for (const record of upcoming) {
+        const tr = document.createElement("tr");
+        const vals = [record.route, record.trip, record.stop, fmt(record.time),
+          record.delay === null ? "—" : (record.delay > 0 ? "+" : "") + Math.round(record.delay / 60) + " min"];
+        for (const v of vals) {
+          const td = document.createElement("td");
+          td.textContent = v;
+          tr.appendChild(td);
+        }
+        tbody.appendChild(tr);
+      }
+      if (!upcoming.length) {
+        const tr = document.createElement("tr"), td = document.createElement("td");
+        td.colSpan = 5; td.textContent = "Nenhuma previsão nas próximas seis horas.";
+        tr.appendChild(td); tbody.appendChild(tr);
+      }
+      show(stale
+        ? "O feed respondeu, mas está desatualizado (" + age + " min). Não usar como informação em tempo real."
+        : "Feed JSON recebido: " + trips + " viagens, " + rows.length + " previsões e " + upcoming.length + " partidas nas próximas 6 horas.", stale);
+    } catch (error) {
+      show("Falha na consulta: " + (error?.message || error) + ". Possíveis causas: CORS, conexão ou indisponibilidade do feed.", true);
+    } finally {
+      clearTimeout(timer);
+      button.disabled = false;
+    }
+  });
+  show("Teste pronto. Clique em Testar HRT agora.");
+})();
 </script></html>
